@@ -23,3 +23,12 @@ candidates for refactoring are:
 The book promises to later re-implement the language in C. I look forward to
 seeing how that will bring insight to improve this Swift version, hopefully
 without having to resort to any `UnsafePointer*` types.
+
+## Similar (Better) Projects
+* Alejandro Martinez
+[beat me to the project and name](https://github.com/alexito4/slox).
+He had the same thoughts as I did regarding following Swift idioms. I missed his
+project at first because I started mine on a plane with no internet access.
+
+* Bob Nystrom lists many alternative implementations in different languages on
+the [books repository](https://github.com/munificent/craftinginterpreters).
