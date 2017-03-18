@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		EE2C42B41E7D5CFE005EAE69 /* Lox.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2C42B31E7D5CFE005EAE69 /* Lox.swift */; };
+		EE2C42B61E7D5D54005EAE69 /* TokenType.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2C42B51E7D5D54005EAE69 /* TokenType.swift */; };
+		EE2C42B81E7D5D8B005EAE69 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2C42B71E7D5D8B005EAE69 /* Token.swift */; };
+		EE2C42BA1E7D5D95005EAE69 /* Scanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2C42B91E7D5D95005EAE69 /* Scanner.swift */; };
 		EE380E7B1E7CA1C400AF9001 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE380E7A1E7CA1C400AF9001 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +27,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		EE2C42B31E7D5CFE005EAE69 /* Lox.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lox.swift; sourceTree = "<group>"; };
+		EE2C42B51E7D5D54005EAE69 /* TokenType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TokenType.swift; sourceTree = "<group>"; };
+		EE2C42B71E7D5D8B005EAE69 /* Token.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
+		EE2C42B91E7D5D95005EAE69 /* Scanner.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Scanner.swift; sourceTree = "<group>"; };
 		EE380E771E7CA1C400AF9001 /* slox */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = slox; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE380E7A1E7CA1C400AF9001 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -58,6 +66,10 @@
 			isa = PBXGroup;
 			children = (
 				EE380E7A1E7CA1C400AF9001 /* main.swift */,
+				EE2C42B31E7D5CFE005EAE69 /* Lox.swift */,
+				EE2C42B51E7D5D54005EAE69 /* TokenType.swift */,
+				EE2C42B71E7D5D8B005EAE69 /* Token.swift */,
+				EE2C42B91E7D5D95005EAE69 /* Scanner.swift */,
 			);
 			path = slox;
 			sourceTree = "<group>";
@@ -121,7 +133,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EE2C42B61E7D5D54005EAE69 /* TokenType.swift in Sources */,
 				EE380E7B1E7CA1C400AF9001 /* main.swift in Sources */,
+				EE2C42B41E7D5CFE005EAE69 /* Lox.swift in Sources */,
+				EE2C42BA1E7D5D95005EAE69 /* Scanner.swift in Sources */,
+				EE2C42B81E7D5D8B005EAE69 /* Token.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -253,6 +269,7 @@
 				EE380E801E7CA1C400AF9001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

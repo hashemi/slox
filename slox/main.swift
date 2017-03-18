@@ -6,7 +6,4 @@
 //  Copyright © 2017 Ahmad Alhashemi. All rights reserved.
 //
 
-import Foundation
-
-print("Hello, World!")
-
+try! Lox.main(Array(CommandLine.arguments.dropFirst()))
