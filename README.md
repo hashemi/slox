@@ -12,17 +12,22 @@ My main goal is to understand the process of writing an interpreter and how an
 interpreter works. I'm intentionally re-producing the Java code in Swift as
 faithfully as possible at first.
 
-A secondary goal will be to refactor the code to make it more Swifty. Top
-candidates for refactoring are:
+Once the code is working, I switch to refactoring it to use Swift features like
+`enum`s with associated values. Current top candidates for refactoring:
 * replacing some classes with structs or plain functions,
 * using associated values with `TokenType` instead of stashing values in an
   `Any` property of `Token`, and
-* string manipulation in the `Scanner` class, which I'm deferring until
-  Swift 4's string overhaul is complete.
 
 The book promises to later re-implement the language in C. I look forward to
 seeing how that will bring insight to improve this Swift version, hopefully
-without having to resort to any `UnsafePointer*` types.
+without having to resort to too many `Unsafe*` types.
+
+## Progress
+As of 22 Mar 2017, the code is up to date with the book. The following chapters
+are implemented:
+* Scanning
+* Representing Code
+* Parsing Expressions
 
 ## Similar (Better) Projects
 * Alejandro Martinez
