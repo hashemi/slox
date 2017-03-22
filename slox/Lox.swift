@@ -45,7 +45,7 @@ class Lox {
         let expr = parser.parse()
         
         if let expr = expr, !hadError {
-            print(AstPrinter().print(expr))
+            print(expr.ast)
         }
     }
     
