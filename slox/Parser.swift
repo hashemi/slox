@@ -12,6 +12,18 @@ class Parser {
     let tokens: [Token]
     var current = 0
     
+    private var isAtEnd: Bool {
+        return peek.type == .EOF
+    }
+    
+    private var peek: Token {
+        return tokens[current]
+    }
+    
+    private var previous: Token {
+        return tokens[current - 1]
+    }
+    
     init(_ tokens: [Token]) {
         self.tokens = tokens
     }
@@ -28,7 +40,7 @@ class Parser {
         var expr = try comparison()
         
         while match([.BANG_EQUAL, .EQUAL_EQUAL]) {
-            let op = previous()
+            let op = previous
             let right = try comparison()
             expr = .binary(left: expr, op: op, right: right)
         }
@@ -40,7 +52,7 @@ class Parser {
         var expr = try term()
         
         while match([.GREATER, .GREATER_EQUAL, .LESS, .LESS_EQUAL]) {
-            let op = previous()
+            let op = previous
             let right = try term()
             expr = .binary(left: expr, op: op, right: right)
         }
@@ -52,7 +64,7 @@ class Parser {
         var expr = try factor()
         
         while match([.MINUS, .PLUS]) {
-            let op = previous()
+            let op = previous
             let right = try factor()
             expr = .binary(left: expr, op: op, right: right)
         }
@@ -64,7 +76,7 @@ class Parser {
         var expr = try unary()
         
         while match([.SLASH, .STAR]) {
-            let op = previous()
+            let op = previous
             let right = try unary()
             expr = .binary(left: expr, op: op, right: right)
         }
@@ -74,7 +86,7 @@ class Parser {
     
     private func unary() throws -> Expr {
         if match([.BANG, .MINUS]) {
-            let op = previous()
+            let op = previous
             let right = try unary()
             return .unary(op: op, right: right)
         }
@@ -87,7 +99,7 @@ class Parser {
         if match(.TRUE) { return .literal(value: .bool(true)) }
         if match(.NIL) { return .literal(value: .null) }
         
-        if match([.NUMBER, .STRING]) { return .literal(value: previous().literal) }
+        if match([.NUMBER, .STRING]) { return .literal(value: previous.literal) }
         
         if match(.LEFT_PAREN) {
             let expr = try expression()
@@ -95,7 +107,7 @@ class Parser {
             return .grouping(expr: expr)
         }
         
-        throw error(peek(), "Expected expression.")
+        throw error(peek, "Expected expression.")
     }
     
     private func match(_ types: [TokenType]) -> Bool {
@@ -109,36 +121,24 @@ class Parser {
         return false
     }
     
-    private func consume(_ type: TokenType, _ message: String) throws -> Token {
-        if check(type) { return advance() }
-        
-        throw error(peek(), message)
-    }
-
     private func match(_ type: TokenType) -> Bool {
         return match([type])
     }
     
+    private func consume(_ type: TokenType, _ message: String) throws -> Token {
+        if check(type) { return advance() }
+        
+        throw error(peek, message)
+    }
+
     private func check(_ tokenType: TokenType) -> Bool {
-        if isAtEnd() { return false }
-        return peek().type == tokenType
+        if isAtEnd { return false }
+        return peek.type == tokenType
     }
     
     private func advance() -> Token {
-        if !isAtEnd() { current += 1 }
-        return previous()
-    }
-    
-    private func isAtEnd() -> Bool {
-        return peek().type == .EOF
-    }
-    
-    private func peek() -> Token {
-        return tokens[current]
-    }
-    
-    private func previous() -> Token {
-        return tokens[current - 1]
+        if !isAtEnd { current += 1 }
+        return previous
     }
     
     private func error(_ token: Token, _ message: String) -> Error {
@@ -148,10 +148,10 @@ class Parser {
     
     private func synchronize() {
         _ = advance()
-        while !isAtEnd() {
-            if (previous().type == .SEMICOLON) { return }
+        while !isAtEnd {
+            if (previous.type == .SEMICOLON) { return }
             
-            switch (peek().type) {
+            switch (peek.type) {
             case .CLASS: fallthrough
             case .FUN: fallthrough
             case .VAR: fallthrough
