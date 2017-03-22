@@ -6,8 +6,6 @@
 //  Copyright © 2017 Ahmad Alhashemi. All rights reserved.
 //
 
-import Foundation
-
 extension TokenType {
     init?(keyword: String) {
         let keywords: [String: TokenType] = [
@@ -75,7 +73,7 @@ class Scanner {
             scanToken()
         }
         
-        tokens.append(Token(.EOF, "", NSNull(), line))
+        tokens.append(Token(.EOF, "", .null, line))
         return tokens
     }
     
@@ -140,7 +138,7 @@ class Scanner {
             while isDigit(peek) { _ = advance() }
         }
         
-        addToken(.NUMBER, Double(currentText)!)
+        addToken(.NUMBER, .number(Double(currentText)!))
     }
     
     private func string() {
@@ -160,7 +158,7 @@ class Scanner {
         
         let range = source.index(after: start)..<source.index(before: current)
         let value = source[range]
-        addToken(.STRING, value)
+        addToken(.STRING, .string(value))
     }
     
     private func match(_ expected: Character) -> Bool {
@@ -192,10 +190,10 @@ class Scanner {
     }
     
     private func addToken(_ type: TokenType) {
-        addToken(type, NSNull())
+        addToken(type, .null)
     }
     
-    private func addToken(_ type: TokenType, _ literal: Any) {
+    private func addToken(_ type: TokenType, _ literal: LiteralValue) {
         tokens.append(Token(type, currentText, literal, line))
     }
 }

@@ -6,8 +6,6 @@
 //  Copyright © 2017 Ahmad Alhashemi. All rights reserved.
 //
 
-import Foundation
-
 class Parser {
     private struct ParseError: Error {}
 
@@ -85,9 +83,9 @@ class Parser {
     }
     
     private func primary() throws -> Expr {
-        if match(.FALSE) { return .literal(value: false) }
-        if match(.TRUE) { return .literal(value: true) }
-        if match(.NIL) { return .literal(value: NSNull()) }
+        if match(.FALSE) { return .literal(value: .bool(false)) }
+        if match(.TRUE) { return .literal(value: .bool(true)) }
+        if match(.NIL) { return .literal(value: .null) }
         
         if match([.NUMBER, .STRING]) { return .literal(value: previous().literal) }
         

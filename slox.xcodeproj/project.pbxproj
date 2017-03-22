@@ -14,6 +14,7 @@
 		EE2C42BE1E7DE3AE005EAE69 /* Expr.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2C42BD1E7DE3AE005EAE69 /* Expr.swift */; };
 		EE2C42C01E816F84005EAE69 /* AstPrinter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2C42BF1E816F84005EAE69 /* AstPrinter.swift */; };
 		EE2C42C21E8201E4005EAE69 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2C42C11E8201E4005EAE69 /* Parser.swift */; };
+		EE2C42C41E82C91E005EAE69 /* LiteralValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE2C42C31E82C91E005EAE69 /* LiteralValue.swift */; };
 		EE380E7B1E7CA1C400AF9001 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE380E7A1E7CA1C400AF9001 /* main.swift */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +38,7 @@
 		EE2C42BD1E7DE3AE005EAE69 /* Expr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Expr.swift; sourceTree = "<group>"; };
 		EE2C42BF1E816F84005EAE69 /* AstPrinter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AstPrinter.swift; sourceTree = "<group>"; };
 		EE2C42C11E8201E4005EAE69 /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
+		EE2C42C31E82C91E005EAE69 /* LiteralValue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LiteralValue.swift; sourceTree = "<group>"; };
 		EE380E771E7CA1C400AF9001 /* slox */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = slox; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE380E7A1E7CA1C400AF9001 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -77,6 +79,7 @@
 				EE2C42B71E7D5D8B005EAE69 /* Token.swift */,
 				EE2C42B91E7D5D95005EAE69 /* Scanner.swift */,
 				EE2C42BD1E7DE3AE005EAE69 /* Expr.swift */,
+				EE2C42C31E82C91E005EAE69 /* LiteralValue.swift */,
 				EE2C42BF1E816F84005EAE69 /* AstPrinter.swift */,
 				EE2C42C11E8201E4005EAE69 /* Parser.swift */,
 			);
@@ -149,6 +152,7 @@
 				EE2C42C21E8201E4005EAE69 /* Parser.swift in Sources */,
 				EE2C42BA1E7D5D95005EAE69 /* Scanner.swift in Sources */,
 				EE2C42BE1E7DE3AE005EAE69 /* Expr.swift in Sources */,
+				EE2C42C41E82C91E005EAE69 /* LiteralValue.swift in Sources */,
 				EE2C42B81E7D5D8B005EAE69 /* Token.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

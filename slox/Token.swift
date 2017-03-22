@@ -9,10 +9,10 @@
 class Token {
     let type: TokenType
     let lexeme: String
-    let literal: Any
+    let literal: LiteralValue
     let line: Int
     
-    init(_ type: TokenType, _ lexeme: String, _ literal: Any, _ line: Int) {
+    init(_ type: TokenType, _ lexeme: String, _ literal: LiteralValue, _ line: Int) {
         self.type = type
         self.lexeme = lexeme
         self.literal = literal
