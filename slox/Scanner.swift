@@ -12,12 +12,14 @@ class Scanner {
     private let source: String
     private var tokens: [Token] = []
     
-    private var start = 0
-    private var current = 0
+    private var start: String.Index
+    private var current: String.Index
     private var line = 1
     
     init(_ source: String) {
         self.source = source
+        self.start = source.startIndex
+        self.current = source.startIndex
     }
     
     func scanTokens() -> [Token] {
@@ -31,7 +33,7 @@ class Scanner {
     }
     
     private func isAtEnd() -> Bool {
-        return current >= source.characters.count
+        return current >= source.endIndex
     }
     
     private func scanToken() {
@@ -100,8 +102,7 @@ class Scanner {
     private func identifier() {
         while (isAlphaNumeric(peek())) { let _ = advance() }
         
-        let cs = source.characters
-        let text = String(cs[cs.index(cs.startIndex, offsetBy: start)..<cs.index(cs.startIndex, offsetBy: current)])
+        let text = source[start..<current]
         
         let type = Scanner.keywords[text] ?? .IDENTIFIER
         addToken(type)
@@ -117,8 +118,7 @@ class Scanner {
             while isDigit(peek()) { let _ = advance() }
         }
         
-        let cs = source.characters
-        let strvalue = String(cs[cs.index(cs.startIndex, offsetBy: start)..<cs.index(cs.startIndex, offsetBy: current)])
+        let strvalue = source[start..<current]
         
         addToken(.NUMBER, Double(strvalue)!)
     }
@@ -138,31 +138,28 @@ class Scanner {
         // The closing ".
         let _ = advance()
         
-        let cs = source.characters
-        let range = cs.index(cs.startIndex, offsetBy: start + 1)..<cs.index(cs.startIndex, offsetBy: current - 1)
-        let value = String(cs[range])
+        let range = source.index(after: start)..<source.index(before: current)
+        let value = source[range]
         addToken(.STRING, value)
     }
     
     private func match(_ expected: Character) -> Bool {
         if isAtEnd() { return false; }
-        let cs = source.characters
-        if cs[cs.index(cs.startIndex, offsetBy: current)] != expected { return false }
+        if source[current] != expected { return false }
         
-        current += 1
+        current = source.index(after: current)
         return true
     }
     
     private func peek() -> Character {
-        if current >= source.characters.count { return "\0" }
-        let cs = source.characters
-        return cs[cs.index(cs.startIndex, offsetBy: current)]
+        if current >= source.endIndex { return "\0" }
+        return source[current]
     }
     
     private func peekNext() -> Character {
-        if current + 1 >= source.characters.count { return "\0" }
-        let cs = source.characters
-        return cs[cs.index(cs.startIndex, offsetBy: current + 1)]
+        let next = source.index(after: current)
+        if next >= source.endIndex { return "\0" }
+        return source[next]
     }
     
     private func isAlpha(_ c: Character) -> Bool {
@@ -180,9 +177,9 @@ class Scanner {
     }
     
     private func advance() -> Character {
-        current += 1
-        let cs = source.characters
-        return cs[cs.index(cs.startIndex, offsetBy: current - 1)]
+        let result = source[current]
+        current = source.index(after: current)
+        return result
     }
     
     private func addToken(_ type: TokenType) {
@@ -190,10 +187,7 @@ class Scanner {
     }
     
     private func addToken(_ type: TokenType, _ literal: Any) {
-        let cs = source.characters
-        let startIdx = cs.index(cs.startIndex, offsetBy: start)
-        let currentIdx = cs.index(cs.startIndex, offsetBy: current)
-        let text = String(cs[startIdx..<currentIdx])
+        let text = source[start..<current]
         tokens.append(Token(type, text, literal, line))
     }
 }
