@@ -8,6 +8,34 @@
 
 import Foundation
 
+extension TokenType {
+    init?(keyword: String) {
+        let keywords: [String: TokenType] = [
+            "and": .AND,
+            "class": .CLASS,
+            "else": .ELSE,
+            "false": .FALSE,
+            "for": .FOR,
+            "fun": .FUN,
+            "if": .IF,
+            "nil": .NIL,
+            "or": .OR,
+            "print": .PRINT,
+            "return": .RETURN,
+            "super": .SUPER,
+            "this": .THIS,
+            "true": .TRUE,
+            "var": .VAR,
+            "while": .WHILE
+        ]
+        
+        guard let type = keywords[keyword]
+            else { return nil }
+        
+        self = type
+    }
+}
+
 class Scanner {
     private let source: String
     private var tokens: [Token] = []
@@ -16,6 +44,25 @@ class Scanner {
     private var current: String.Index
     private var line = 1
     
+    private var currentText: String {
+        return source[start..<current]
+    }
+
+    private var isAtEnd: Bool {
+        return current >= source.endIndex
+    }
+    
+    private var peek: Character {
+        if current >= source.endIndex { return "\0" }
+        return source[current]
+    }
+    
+    private var peekNext: Character {
+        let next = source.index(after: current)
+        if next >= source.endIndex { return "\0" }
+        return source[next]
+    }
+    
     init(_ source: String) {
         self.source = source
         self.start = source.startIndex
@@ -23,17 +70,13 @@ class Scanner {
     }
     
     func scanTokens() -> [Token] {
-        while (!isAtEnd()) {
+        while (!isAtEnd) {
             start = current
             scanToken()
         }
         
         tokens.append(Token(.EOF, "", NSNull(), line))
         return tokens
-    }
-    
-    private func isAtEnd() -> Bool {
-        return current >= source.endIndex
     }
     
     private func scanToken() {
@@ -57,7 +100,7 @@ class Scanner {
             
         case "/":
             if match("/") {
-                while (peek() != "\n" && !isAtEnd()) { let _ = advance() }
+                while (peek != "\n" && !isAtEnd) { _ = advance() }
             } else {
                 addToken(.SLASH)
             }
@@ -80,63 +123,40 @@ class Scanner {
         }
     }
     
-    private static let keywords: [String: TokenType] = [
-        "and": .AND,
-        "class": .CLASS,
-        "else": .ELSE,
-        "false": .FALSE,
-        "for": .FOR,
-        "fun": .FUN,
-        "if": .IF,
-        "nil": .NIL,
-        "or": .OR,
-        "print": .PRINT,
-        "return": .RETURN,
-        "super": .SUPER,
-        "this": .THIS,
-        "true": .TRUE,
-        "var": .VAR,
-        "while": .WHILE
-    ]
-    
     private func identifier() {
-        while (isAlphaNumeric(peek())) { let _ = advance() }
+        while isAlphaNumeric(peek) { _ = advance() }
         
-        let text = source[start..<current]
-        
-        let type = Scanner.keywords[text] ?? .IDENTIFIER
+        let type = TokenType(keyword: currentText) ?? .IDENTIFIER
         addToken(type)
     }
     
     private func number() {
-        while isDigit(peek()) { let _ = advance() }
+        while isDigit(peek) { _ = advance() }
         
-        if peek() == "." && isDigit(peekNext()) {
+        if peek == "." && isDigit(peekNext) {
             // Consume the "."
-            let _ = advance()
+            _ = advance()
             
-            while isDigit(peek()) { let _ = advance() }
+            while isDigit(peek) { _ = advance() }
         }
         
-        let strvalue = source[start..<current]
-        
-        addToken(.NUMBER, Double(strvalue)!)
+        addToken(.NUMBER, Double(currentText)!)
     }
     
     private func string() {
-        while (peek() != "\"" && !isAtEnd()) {
-            if (peek() == "\n") { line += 1 }
-            let _ = advance()
+        while (peek != "\"" && !isAtEnd) {
+            if (peek == "\n") { line += 1 }
+            _ = advance()
         }
         
         // Unterminated string.
-        if (isAtEnd()) {
+        if (isAtEnd) {
             Lox.error(line, "Unterminated string.")
             return
         }
         
         // The closing ".
-        let _ = advance()
+        _ = advance()
         
         let range = source.index(after: start)..<source.index(before: current)
         let value = source[range]
@@ -144,22 +164,11 @@ class Scanner {
     }
     
     private func match(_ expected: Character) -> Bool {
-        if isAtEnd() { return false; }
+        if isAtEnd { return false }
         if source[current] != expected { return false }
         
         current = source.index(after: current)
         return true
-    }
-    
-    private func peek() -> Character {
-        if current >= source.endIndex { return "\0" }
-        return source[current]
-    }
-    
-    private func peekNext() -> Character {
-        let next = source.index(after: current)
-        if next >= source.endIndex { return "\0" }
-        return source[next]
     }
     
     private func isAlpha(_ c: Character) -> Bool {
@@ -187,7 +196,6 @@ class Scanner {
     }
     
     private func addToken(_ type: TokenType, _ literal: Any) {
-        let text = source[start..<current]
-        tokens.append(Token(type, text, literal, line))
+        tokens.append(Token(type, currentText, literal, line))
     }
 }
