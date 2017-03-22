@@ -16,13 +16,13 @@ func parenthesize(_ name: String, _ exprs: [Expr]) -> String {
 extension Expr {
     var ast: String {
         switch self {
-        case .Binary(let left, let op, let right):
+        case .binary(let left, let op, let right):
             return parenthesize(op.lexeme, [left, right])
-        case .Grouping(let expr):
+        case .grouping(let expr):
             return parenthesize("group", [expr])
-        case .Literal(let value):
+        case .literal(let value):
             return "\(value)"
-        case .Unary(let op, let right):
+        case .unary(let op, let right):
             return parenthesize(op.lexeme, [right])
         }
     }

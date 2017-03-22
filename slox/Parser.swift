@@ -32,7 +32,7 @@ class Parser {
         while match([.BANG_EQUAL, .EQUAL_EQUAL]) {
             let op = previous()
             let right = try comparison()
-            expr = .Binary(left: expr, op: op, right: right)
+            expr = .binary(left: expr, op: op, right: right)
         }
         
         return expr
@@ -44,7 +44,7 @@ class Parser {
         while match([.GREATER, .GREATER_EQUAL, .LESS, .LESS_EQUAL]) {
             let op = previous()
             let right = try term()
-            expr = .Binary(left: expr, op: op, right: right)
+            expr = .binary(left: expr, op: op, right: right)
         }
         
         return expr
@@ -56,7 +56,7 @@ class Parser {
         while match([.MINUS, .PLUS]) {
             let op = previous()
             let right = try factor()
-            expr = .Binary(left: expr, op: op, right: right)
+            expr = .binary(left: expr, op: op, right: right)
         }
         
         return expr
@@ -68,7 +68,7 @@ class Parser {
         while match([.SLASH, .STAR]) {
             let op = previous()
             let right = try unary()
-            expr = .Binary(left: expr, op: op, right: right)
+            expr = .binary(left: expr, op: op, right: right)
         }
         
         return expr
@@ -78,23 +78,23 @@ class Parser {
         if match([.BANG, .MINUS]) {
             let op = previous()
             let right = try unary()
-            return .Unary(op: op, right: right)
+            return .unary(op: op, right: right)
         }
         
         return try primary()
     }
     
     private func primary() throws -> Expr {
-        if match(.FALSE) { return .Literal(value: false) }
-        if match(.TRUE) { return .Literal(value: true) }
-        if match(.NIL) { return .Literal(value: NSNull()) }
+        if match(.FALSE) { return .literal(value: false) }
+        if match(.TRUE) { return .literal(value: true) }
+        if match(.NIL) { return .literal(value: NSNull()) }
         
-        if match([.NUMBER, .STRING]) { return .Literal(value: previous().literal) }
+        if match([.NUMBER, .STRING]) { return .literal(value: previous().literal) }
         
         if match(.LEFT_PAREN) {
             let expr = try expression()
             _ = try consume(.RIGHT_PAREN, "Expect ')' after expression.")
-            return .Grouping(expr: expr)
+            return .grouping(expr: expr)
         }
         
         throw error(peek(), "Expected expression.")
