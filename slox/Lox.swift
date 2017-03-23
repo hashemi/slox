@@ -8,7 +8,7 @@
 
 import Foundation
 
-class Lox {
+struct Lox {
     static var hadError = false
     
     static func main(_ args: [String]) throws {
