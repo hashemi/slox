@@ -34,6 +34,23 @@ extension TokenType {
     }
 }
 
+private extension Character {
+    var isAlpha: Bool {
+        return
+            (self >= "a" && self <= "z") ||
+            (self >= "A" && self <= "Z") ||
+            self == "_"
+    }
+
+    var isDigit: Bool {
+        return self >= "0" && self <= "9"
+    }
+
+    var isAlphaNumeric: Bool {
+        return isAlpha || isDigit
+    }
+}
+
 class Scanner {
     private let source: String
     private var tokens: [Token] = []
@@ -109,33 +126,31 @@ class Scanner {
         case "\t": break
             
         case "\n": line += 1
+        
+        case _ where c.isDigit: number()
             
+        case _ where c.isAlpha: identifier()
+        
         default:
-            if isDigit(c) {
-                number()
-            } else if isAlpha(c) {
-                identifier()
-            } else {
-                Lox.error(line, "Unexpected character.")
-            }
+            Lox.error(line, "Unexpected character.")
         }
     }
     
     private func identifier() {
-        while isAlphaNumeric(peek) { _ = advance() }
+        while peek.isAlphaNumeric { _ = advance() }
         
         let type = TokenType(keyword: currentText) ?? .IDENTIFIER
         addToken(type)
     }
     
     private func number() {
-        while isDigit(peek) { _ = advance() }
+        while peek.isDigit { _ = advance() }
         
-        if peek == "." && isDigit(peekNext) {
+        if peek == "." && peekNext.isDigit {
             // Consume the "."
             _ = advance()
             
-            while isDigit(peek) { _ = advance() }
+            while peek.isDigit { _ = advance() }
         }
         
         addToken(.NUMBER, .number(Double(currentText)!))
@@ -167,20 +182,6 @@ class Scanner {
         
         current = source.index(after: current)
         return true
-    }
-    
-    private func isAlpha(_ c: Character) -> Bool {
-        return (c >= "a" && c <= "z") ||
-            (c >= "A" && c <= "Z") ||
-            c == "_"
-    }
-    
-    private func isDigit(_ c: Character) -> Bool {
-        return c >= "0" && c <= "9"
-    }
-    
-    private func isAlphaNumeric(_ c: Character) -> Bool {
-        return isAlpha(c) || isDigit(c)
     }
     
     private func advance() -> Character {
