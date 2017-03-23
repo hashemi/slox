@@ -6,7 +6,7 @@
 //  Copyright © 2017 Ahmad Alhashemi. All rights reserved.
 //
 
-class Token {
+struct Token {
     let type: TokenType
     let lexeme: String
     let literal: LiteralValue
