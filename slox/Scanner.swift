@@ -190,11 +190,7 @@ class Scanner {
         return result
     }
     
-    private func addToken(_ type: TokenType) {
-        addToken(type, .null)
-    }
-    
-    private func addToken(_ type: TokenType, _ literal: LiteralValue) {
+    private func addToken(_ type: TokenType, _ literal: LiteralValue = .null) {
         tokens.append(Token(type, currentText, literal, line))
     }
 }
