@@ -10,6 +10,7 @@ import Foundation
 
 struct Lox {
     static var hadError = false
+    static var hadRuntimeError = false
     
     static func main(_ args: [String]) throws {
         if args.count > 1 {
@@ -24,9 +25,9 @@ struct Lox {
     static func runFile(_ path: String) throws {
         let bytes = try Data(contentsOf: URL(fileURLWithPath: path))
         run(String(bytes: bytes, encoding: .utf8)!)
-        if (hadError) {
-            exit(65)
-        }
+        
+        if hadError { exit(65) }
+        if hadRuntimeError { exit(70) }
     }
     
     static func runPrompt() throws {
@@ -42,10 +43,15 @@ struct Lox {
         let tokens = scanner.scanTokens()
         
         let parser = Parser(tokens)
-        let expr = parser.parse()
         
-        if let expr = expr, !hadError {
-            print(expr.ast)
+        if let expr = parser.parse() {
+            do {
+                try print(expr.interpret())
+            } catch let error as RuntimeError {
+                runtimeError(error)
+            } catch {
+                fatalError("Unexpected error.")
+            }
         }
     }
     
@@ -64,5 +70,10 @@ struct Lox {
         } else {
             report(token.line, " at '" + token.lexeme + "'", message)
         }
+    }
+    
+    static func runtimeError(_ error: RuntimeError) {
+        fputs(error.message + "\n[line " + String(error.token.line) + "]", __stderrp)
+        hadRuntimeError = true
     }
 }

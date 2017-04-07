@@ -12,3 +12,46 @@ enum LiteralValue {
     case string(String)
     case null
 }
+
+extension LiteralValue {
+    var isTrue: Bool {
+        switch self {
+        case .null: return false
+        case let .bool(val): return val
+        case .number, .string: return true
+        }
+    }
+}
+
+extension LiteralValue: Equatable {
+    static func ==(lhs: LiteralValue, rhs: LiteralValue) -> Bool {
+        switch (lhs, rhs) {
+        case (.null, .null):
+            return true
+        case let (.string(left), .string(right)):
+            return left == right
+        case let (.number(left), .number(right)):
+            return left == right
+        case let (.bool(left), .bool(right)):
+            return left == right
+        case (.null, _), (.bool, _), (.string, _), (.number, _):
+            return false
+        }
+    }
+}
+
+extension LiteralValue: CustomStringConvertible {
+    var description: String {
+        switch self {
+        case .null:
+            return "nil"
+        case let .number(number):
+            let str = String(number)
+            return str.hasSuffix(".0") ? str[str.startIndex..<str.index(str.endIndex, offsetBy: -2)] : str
+        case let .string(string):
+            return string
+        case let .bool(bool) :
+            return String(bool)
+        }
+    }
+}
