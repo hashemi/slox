@@ -41,7 +41,7 @@ class Parser {
     }
     
     private func expression() throws -> Expr {
-        return try equality()
+        return try assignment()
     }
     
     private func declaration() throws -> Stmt? {
@@ -82,6 +82,23 @@ class Parser {
         let expr = try expression()
         _ = try consume(.SEMICOLON, "Expect ';' after expression.")
         return .expr(expr: expr)
+    }
+    
+    private func assignment() throws -> Expr {
+        let expr = try equality()
+        
+        if match(.EQUAL) {
+            let equals = previous
+            let value = try assignment()
+            
+            if case let .variable(name) = expr {
+                return .assign(name: name, value: value)
+            }
+            
+            throw error(equals, "Invalid assignment target.")
+        }
+        
+        return expr
     }
     
     private func equality() throws -> Expr {

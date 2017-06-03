@@ -20,4 +20,12 @@ struct Environment {
         
         return value
     }
+    
+    mutating func assign(name: Token, value: LiteralValue) throws {
+        guard values.keys.contains(name.lexeme) else {
+            throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
+        }
+        
+        values[name.lexeme] = value
+    }
 }

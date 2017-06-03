@@ -91,6 +91,10 @@ extension Expr {
             return try expr.evaluate()
         case .variable(let name):
             return try environment.get(name: name)
+        case .assign(let name, let value):
+            let value = try value.evaluate()
+            try environment.assign(name: name, value: value)
+            return value
         }
     }
 }

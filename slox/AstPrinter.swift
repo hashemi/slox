@@ -26,6 +26,8 @@ extension Expr {
             return parenthesize(op.lexeme, [right])
         case .variable(let name):
             return name.lexeme
+        case .assign(let name, let value):
+            return parenthesize("= \(name)", [value])
         }
     }
 }
