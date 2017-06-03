@@ -9,6 +9,7 @@
 import Foundation
 
 enum Stmt {
+    case block(statements: [Stmt])
     case print(expr: Expr)
     case expr(expr: Expr)
     case variable(name: Token, initializer: Expr)

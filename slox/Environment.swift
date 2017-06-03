@@ -6,24 +6,35 @@
 //  Copyright © 2017 Ahmad Alhashemi. All rights reserved.
 //
 
-struct Environment {
+class Environment {
     var values: [String: LiteralValue] = [:]
+    let enclosing: Environment?
     
-    mutating func define(name: String, value: LiteralValue) {
+    init(enclosing: Environment? = nil) {
+        self.enclosing = enclosing
+    }
+    
+    func define(name: String, value: LiteralValue) {
         values[name] = value
     }
     
     func get(name: Token) throws -> LiteralValue {
         guard let value = values[name.lexeme] else {
-            throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
+            guard let enclosing = self.enclosing else {
+                throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
+            }
+            return try enclosing.get(name: name)
         }
         
         return value
     }
     
-    mutating func assign(name: Token, value: LiteralValue) throws {
+    func assign(name: Token, value: LiteralValue) throws {
         guard values.keys.contains(name.lexeme) else {
-            throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
+            guard let enclosing = self.enclosing else {
+                throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
+            }
+            return try enclosing.assign(name: name, value: value)
         }
         
         values[name.lexeme] = value

@@ -110,6 +110,15 @@ extension Stmt {
         case .variable(let name, let initializer):
             let value = try initializer.evaluate()
             environment.define(name: name.lexeme, value: value)
+        case .block(let statements):
+            let previous = environment
+            defer {
+                environment = previous
+            }
+            environment = Environment(enclosing: environment)
+            for statement in statements {
+                try statement.execute()
+            }
         }
     }
 }

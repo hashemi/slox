@@ -62,6 +62,10 @@ class Parser {
             return try printStatement()
         }
         
+        if match(.LEFT_BRACE) {
+            return .block(statements: try block())
+        }
+        
         return try expressionStatement()
     }
     
@@ -82,6 +86,19 @@ class Parser {
         let expr = try expression()
         _ = try consume(.SEMICOLON, "Expect ';' after expression.")
         return .expr(expr: expr)
+    }
+    
+    private func block() throws -> [Stmt] {
+        var statements: [Stmt] = []
+        
+        while !check(.RIGHT_BRACE) && !isAtEnd {
+            if let statement = try declaration() {
+                statements.append(statement)
+            }
+        }
+        
+        _ = try consume(.RIGHT_BRACE, "Expect '}' after block.")
+        return statements
     }
     
     private func assignment() throws -> Expr {
