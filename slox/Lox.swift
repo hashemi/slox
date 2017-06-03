@@ -62,7 +62,7 @@ struct Lox {
     }
     
     static func report(_ line: Int, _ `where`: String, _ message: String) {
-        print("[line \(line)] Error\(`where`): \(message)")
+        fputs("[line \(line)] Error\(`where`): \(message)\n",  __stderrp)
         hadError = true
     }
     
@@ -70,12 +70,12 @@ struct Lox {
         if token.type == .EOF {
             report(token.line, " at end", message)
         } else {
-            report(token.line, " at '" + token.lexeme + "'", message)
+            report(token.line, " at '\(token.lexeme)'", message)
         }
     }
     
     static func runtimeError(_ error: RuntimeError) {
-        fputs(error.message + "\n[line " + String(error.token.line) + "]", __stderrp)
+        fputs("\(error.message)\n[line \(String(error.token.line))]\n", __stderrp)
         hadRuntimeError = true
     }
 }
