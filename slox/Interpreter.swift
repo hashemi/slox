@@ -72,9 +72,12 @@ extension Expr {
                 return .string(leftString + rightString)
             }
             
+            switch op.type {
+            case .BANG_EQUAL: return .bool(left != right)
+            case .EQUAL_EQUAL: return .bool(left == right)
+            
             // By the time we got here, all correct binary operators with correct value
             // types are handled. Next handle correct operators with incorrect types.
-            switch op.type {
             case .PLUS:
                 throw RuntimeError(op, "Operands must be two numbers or two strings.")
             case .MINUS, .SLASH, .STAR, .GREATER, .GREATER_EQUAL, .LESS, .LESS_EQUAL:
