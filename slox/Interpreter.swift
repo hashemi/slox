@@ -6,8 +6,6 @@
 //  Copyright © 2017 Ahmad Alhashemi. All rights reserved.
 //
 
-var environment = Environment()
-
 struct RuntimeError: Error {
     let token: Token
     let message: String
@@ -19,13 +17,13 @@ struct RuntimeError: Error {
 }
 
 extension Expr {
-    func evaluate() throws -> LiteralValue {
+    func evaluate(environment: Environment) throws -> LiteralValue {
         switch self {
         case .literal(let value):
             return value
 
         case .unary(let op, let rightExpr):
-            let right = try rightExpr.evaluate()
+            let right = try rightExpr.evaluate(environment: environment)
             
             switch op.type {
             case .BANG:
@@ -42,8 +40,8 @@ extension Expr {
             return .null
 
         case .binary(let leftExpr, let op, let rightExpr):
-            let left = try leftExpr.evaluate()
-            let right = try rightExpr.evaluate()
+            let left = try leftExpr.evaluate(environment: environment)
+            let right = try rightExpr.evaluate(environment: environment)
             
             if case let .number(leftNumber) = left,
                 case let .number(rightNumber) = right {
@@ -88,11 +86,11 @@ extension Expr {
             return .null
         
         case .grouping(let expr):
-            return try expr.evaluate()
+            return try expr.evaluate(environment: environment)
         case .variable(let name):
             return try environment.get(name: name)
         case .assign(let name, let value):
-            let value = try value.evaluate()
+            let value = try value.evaluate(environment: environment)
             try environment.assign(name: name, value: value)
             return value
         }
@@ -100,24 +98,20 @@ extension Expr {
 }
 
 extension Stmt {
-    func execute() throws {
+    func execute(environment: Environment) throws {
         switch self {
         case .expr(let expr):
-            _ = try expr.evaluate()
+            _ = try expr.evaluate(environment: environment)
         case .print(let expr):
-            let value = try expr.evaluate()
+            let value = try expr.evaluate(environment: environment)
             Swift.print(value)
         case .variable(let name, let initializer):
-            let value = try initializer.evaluate()
+            let value = try initializer.evaluate(environment: environment)
             environment.define(name: name.lexeme, value: value)
         case .block(let statements):
-            let previous = environment
-            defer {
-                environment = previous
-            }
-            environment = Environment(enclosing: environment)
+            let blockEnvironment = Environment(enclosing: environment)
             for statement in statements {
-                try statement.execute()
+                try statement.execute(environment: blockEnvironment)
             }
         }
     }

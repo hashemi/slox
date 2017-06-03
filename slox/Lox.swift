@@ -43,10 +43,11 @@ struct Lox {
         let tokens = scanner.scanTokens()
         
         let parser = Parser(tokens)
+        let global = Environment()
         
         do {
             for statement in try parser.parse() {
-                try statement.execute()
+                try statement.execute(environment: global)
             }
         } catch let error as RuntimeError {
             runtimeError(error)
