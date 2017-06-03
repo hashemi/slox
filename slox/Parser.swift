@@ -191,7 +191,7 @@ class Parser {
             return .grouping(expr: expr)
         }
         
-        throw error(peek, "Expected expression.")
+        throw error(peek, "Expect expression.")
     }
     
     private func match(_ types: [TokenType]) -> Bool {
