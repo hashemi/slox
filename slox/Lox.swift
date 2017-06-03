@@ -24,31 +24,31 @@ struct Lox {
     
     static func runFile(_ path: String) throws {
         let bytes = try Data(contentsOf: URL(fileURLWithPath: path))
-        run(String(bytes: bytes, encoding: .utf8)!)
+        run(String(bytes: bytes, encoding: .utf8)!, environment: Environment())
         
         if hadError { exit(65) }
         if hadRuntimeError { exit(70) }
     }
     
     static func runPrompt() throws {
+        let environment = Environment()
         while true {
             print("> ", terminator: "")
             guard let line = readLine() else { return }
-            run(line)
+            run(line, environment: environment)
             hadError = false
         }
     }
     
-    static func run(_ source: String) {
+    static func run(_ source: String, environment: Environment) {
         let scanner = Scanner(source)
         let tokens = scanner.scanTokens()
         
         let parser = Parser(tokens)
-        let global = Environment()
         
         do {
             for statement in try parser.parse() {
-                try statement.execute(environment: global)
+                try statement.execute(environment: environment)
             }
         } catch let error as RuntimeError {
             runtimeError(error)
