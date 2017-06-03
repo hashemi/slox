@@ -17,16 +17,17 @@ seeing how that will bring insight to improve this Swift version, hopefully
 without having to resort to too many `Unsafe*` types.
 
 ## Progress
-As of 7 Apr 2017, the code is up to date with the book. The following chapters
+As of 3 Jun 2017, the code is up to date with the book. The following chapters
 are implemented:
 * Scanning
 * Representing Code
 * Parsing Expressions
 * Evaluating Expressions
+* Statements and State
 
 ## Alternatives
 * Alejandro Martinez
-[beat me to the project and name](https://github.com/alexito4/slox).
+[beat me to the port and name](https://github.com/alexito4/slox).
 
 * Bob Nystrom lists ports in different languages on the
 [books wiki on GitHub](https://github.com/munificent/craftinginterpreters/wiki/Lox-implementations).
