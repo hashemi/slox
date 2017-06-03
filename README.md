@@ -29,7 +29,8 @@ exchanges all Lox data as Java `Object` types. This neccessates runtime
 type checks and coerced type casting. In this Swift implementation, enums
 are used instead to create a restricted and explicit set of possible Lox
 data types with the actual data attached as associated values to the
-enum cases in the correct Swift types.
+enum cases in the correct Swift types. There's no type casting and the
+`Any` type (Swift's equivalent to `Object`) is not used in this project.
 
 **Enums make the visitor pattern redundant.** As Bob Nystrom says in the
 book:
