@@ -33,7 +33,8 @@ struct Lox {
     static func runPrompt() throws {
         while true {
             print("> ", terminator: "")
-            run(readLine() ?? "")
+            guard let line = readLine() else { return }
+            run(line)
             hadError = false
         }
     }
