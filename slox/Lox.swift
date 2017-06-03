@@ -44,14 +44,14 @@ struct Lox {
         
         let parser = Parser(tokens)
         
-        if let expr = parser.parse() {
-            do {
-                try print(expr.interpret())
-            } catch let error as RuntimeError {
-                runtimeError(error)
-            } catch {
-                fatalError("Unexpected error.")
+        do {
+            for statement in try parser.parse() {
+                try statement.execute()
             }
+        } catch let error as RuntimeError {
+            runtimeError(error)
+        } catch {
+            fatalError("Unexpected error.")
         }
     }
     

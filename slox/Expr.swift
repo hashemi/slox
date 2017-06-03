@@ -11,4 +11,5 @@ indirect enum Expr {
     case grouping(expr: Expr)
     case literal(value: LiteralValue)
     case unary(op: Token, right: Expr)
+    case variable(name: Token)
 }

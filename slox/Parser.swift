@@ -28,12 +28,60 @@ class Parser {
         self.tokens = tokens
     }
     
-    func parse() -> Expr? {
-        return try? expression()
+    func parse() throws -> [Stmt] {
+        var statements: [Stmt] = []
+        
+        while !isAtEnd {
+            if let statement = try declaration() {
+                statements.append(statement)
+            }
+        }
+        
+        return statements
     }
     
     private func expression() throws -> Expr {
         return try equality()
+    }
+    
+    private func declaration() throws -> Stmt? {
+        do {
+            if match(.VAR) {
+                return try varDeclaration()
+            }
+            
+            return try statement()
+        } catch is ParseError {
+            synchronize()
+            return nil
+        }
+    }
+    
+    private func statement() throws -> Stmt {
+        if match(.PRINT) {
+            return try printStatement()
+        }
+        
+        return try expressionStatement()
+    }
+    
+    private func printStatement() throws -> Stmt {
+        let expr = try expression()
+        _ = try consume(.SEMICOLON, "Expect ';' after value.")
+        return .print(expr: expr)
+    }
+
+    private func varDeclaration() throws -> Stmt {
+        let name = try consume(.IDENTIFIER, "Expect variable name.")
+        let initializer = match(.EQUAL) ? try expression() : .literal(value: .null)
+        _ = try consume(.SEMICOLON, "Expect ';' after variable declaration.")
+        return .variable(name: name, initializer: initializer)
+    }
+    
+    private func expressionStatement() throws -> Stmt {
+        let expr = try expression()
+        _ = try consume(.SEMICOLON, "Expect ';' after expression.")
+        return .expr(expr: expr)
     }
     
     private func equality() throws -> Expr {
@@ -100,6 +148,8 @@ class Parser {
         if match(.NIL) { return .literal(value: .null) }
         
         if match([.NUMBER, .STRING]) { return .literal(value: previous.literal) }
+        
+        if match(.IDENTIFIER) { return .variable(name: previous) }
         
         if match(.LEFT_PAREN) {
             let expr = try expression()

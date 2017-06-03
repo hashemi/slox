@@ -6,6 +6,8 @@
 //  Copyright © 2017 Ahmad Alhashemi. All rights reserved.
 //
 
+var environment = Environment()
+
 struct RuntimeError: Error {
     let token: Token
     let message: String
@@ -17,13 +19,13 @@ struct RuntimeError: Error {
 }
 
 extension Expr {
-    func interpret() throws -> LiteralValue {
+    func evaluate() throws -> LiteralValue {
         switch self {
         case .literal(let value):
             return value
 
         case .unary(let op, let rightExpr):
-            let right = try rightExpr.interpret()
+            let right = try rightExpr.evaluate()
             
             switch op.type {
             case .BANG:
@@ -40,8 +42,8 @@ extension Expr {
             return .null
 
         case .binary(let leftExpr, let op, let rightExpr):
-            let left = try leftExpr.interpret()
-            let right = try rightExpr.interpret()
+            let left = try leftExpr.evaluate()
+            let right = try rightExpr.evaluate()
             
             if case let .number(leftNumber) = left,
                 case let .number(rightNumber) = right {
@@ -86,7 +88,24 @@ extension Expr {
             return .null
         
         case .grouping(let expr):
-            return try expr.interpret()
+            return try expr.evaluate()
+        case .variable(let name):
+            return try environment.get(name: name)
+        }
+    }
+}
+
+extension Stmt {
+    func execute() throws {
+        switch self {
+        case .expr(let expr):
+            _ = try expr.evaluate()
+        case .print(let expr):
+            let value = try expr.evaluate()
+            Swift.print(value)
+        case .variable(let name, let initializer):
+            let value = try initializer.evaluate()
+            environment.define(name: name.lexeme, value: value)
         }
     }
 }

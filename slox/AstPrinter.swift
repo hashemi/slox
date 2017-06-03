@@ -24,6 +24,8 @@ extension Expr {
             return "\(value)"
         case .unary(let op, let right):
             return parenthesize(op.lexeme, [right])
+        case .variable(let name):
+            return name.lexeme
         }
     }
 }
