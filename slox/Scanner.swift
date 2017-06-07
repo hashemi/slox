@@ -60,7 +60,7 @@ class Scanner {
     private var line = 1
     
     private var currentText: String {
-        return source[start..<current]
+        return String(source[start..<current])
     }
 
     private var isAtEnd: Bool {
@@ -173,7 +173,7 @@ class Scanner {
         
         let range = source.index(after: start)..<source.index(before: current)
         let value = source[range]
-        addToken(.STRING, .string(value))
+        addToken(.STRING, .string(String(value)))
     }
     
     private func match(_ expected: Character) -> Bool {

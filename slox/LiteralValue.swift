@@ -47,7 +47,7 @@ extension LiteralValue: CustomStringConvertible {
             return "nil"
         case let .number(number):
             let str = String(number)
-            return str.hasSuffix(".0") ? str[str.startIndex..<str.index(str.endIndex, offsetBy: -2)] : str
+            return str.hasSuffix(".0") ? String(str[str.startIndex..<str.index(str.endIndex, offsetBy: -2)]) : str
         case let .string(string):
             return string
         case let .bool(bool) :
