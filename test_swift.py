@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from os.path import dirname, realpath
 import sys
 from test import JAVA_SUITES, INTERPRETERS, run_suites, run_suite
