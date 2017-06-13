@@ -18,6 +18,17 @@ are implemented:
 7. Evaluating Expressions
 8. Statements and State
 
+## Tests
+As of 13 Jun 2017, the test suite is up to date with the reference Java
+implementation and all chapter 8 tests pass successfully.
+
+To run the tests:
+
+```shell
+$ swift build
+$ ./test_swift.py chap08_statements
+```
+
 ## Goals & Design
 The main goal is to write a Lox interpreter in Swift while demonstrating
 Swift's strengths. The project takes advantage of Swift's enums and
