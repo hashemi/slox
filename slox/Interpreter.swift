@@ -22,6 +22,17 @@ extension Expr {
         case .literal(let value):
             return value
 
+        case .logical(let leftExpr, let op, let rightExpr):
+            let left = try leftExpr.evaluate(environment: environment)
+            
+            if op.type == .OR {
+                if left.isTrue { return left }
+            } else {
+                if !left.isTrue { return left }
+            }
+            
+            return try rightExpr.evaluate(environment: environment)
+            
         case .unary(let op, let rightExpr):
             let right = try rightExpr.evaluate(environment: environment)
             
@@ -115,6 +126,13 @@ extension Stmt {
             let blockEnvironment = Environment(enclosing: environment)
             for statement in statements {
                 try statement.execute(environment: blockEnvironment)
+            }
+        case .if(let condExpr, let thenBranch, let elseBranch):
+            let condition = try condExpr.evaluate(environment: environment).isTrue
+            if condition {
+                try thenBranch.execute(environment: environment)
+            } else {
+                try elseBranch?.execute(environment: environment)
             }
         }
     }

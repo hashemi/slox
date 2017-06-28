@@ -22,6 +22,8 @@ extension Expr {
             return parenthesize("group", [expr])
         case .literal(let value):
             return "\(value)"
+        case .logical(let left, let op, let right):
+            return parenthesize(op.lexeme, [left, right])
         case .unary(let op, let right):
             return parenthesize(op.lexeme, [right])
         case .variable(let name):

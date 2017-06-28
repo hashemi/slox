@@ -58,6 +58,10 @@ class Parser {
     }
     
     private func statement() throws -> Stmt {
+        if match(.IF) {
+            return try ifStatement()
+        }
+        
         if match(.PRINT) {
             return try printStatement()
         }
@@ -67,6 +71,17 @@ class Parser {
         }
         
         return try expressionStatement()
+    }
+    
+    private func ifStatement() throws -> Stmt {
+        _ = try consume(.LEFT_PAREN, "Expect '(' after 'if'.")
+        let condition = try expression()
+        _ = try consume(.RIGHT_PAREN, "Expect ')' after if condition.")
+        
+        let thenBranch = try statement()
+        let elseBranch = match(.ELSE) ? try statement() : nil
+        
+        return .if(expr: condition, then: thenBranch, else: elseBranch)
     }
     
     private func printStatement() throws -> Stmt {
@@ -102,7 +117,8 @@ class Parser {
     }
     
     private func assignment() throws -> Expr {
-        let expr = try equality()
+        let expr = try or()
+        
         
         if match(.EQUAL) {
             let equals = previous
@@ -113,6 +129,30 @@ class Parser {
             }
             
             throw error(equals, "Invalid assignment target.")
+        }
+        
+        return expr
+    }
+    
+    private func or() throws -> Expr {
+        let expr = try and()
+        
+        while match(.OR) {
+            let op = previous
+            let right = try and()
+            return .logical(left: expr, op: op, right: right)
+        }
+        
+        return expr
+    }
+    
+    private func and() throws -> Expr {
+        let expr = try equality()
+        
+        while match(.AND) {
+            let op = previous
+            let right = try equality()
+            return .logical(left: expr, op: op, right: right)
         }
         
         return expr

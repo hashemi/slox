@@ -8,9 +8,10 @@
 
 import Foundation
 
-enum Stmt {
+indirect enum Stmt {
     case block(statements: [Stmt])
     case print(expr: Expr)
     case expr(expr: Expr)
     case variable(name: Token, initializer: Expr)
+    case `if`(expr: Expr, then: Stmt, else: Stmt?)
 }
