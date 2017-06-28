@@ -47,7 +47,9 @@ struct Lox {
         let parser = Parser(tokens)
         
         do {
-            for statement in try parser.parse() {
+            let statements = try parser.parse()
+            if hadError { return }
+            for statement in statements {
                 try statement.execute(environment: environment)
             }
         } catch let error as RuntimeError {
