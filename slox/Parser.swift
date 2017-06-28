@@ -58,6 +58,10 @@ class Parser {
     }
     
     private func statement() throws -> Stmt {
+        if match(.FOR) {
+            return try forStatement()
+        }
+        
         if match(.IF) {
             return try ifStatement()
         }
@@ -66,11 +70,48 @@ class Parser {
             return try printStatement()
         }
         
+        if match(.WHILE) {
+            return try whileStatement()
+        }
+        
         if match(.LEFT_BRACE) {
             return .block(statements: try block())
         }
         
         return try expressionStatement()
+    }
+    
+    private func forStatement() throws -> Stmt {
+        _ = try consume(.LEFT_PAREN, "Expect '(' after 'for'.")
+        
+        var initializer: Stmt?
+        if match(.SEMICOLON) {
+            initializer = nil
+        } else if match(.VAR) {
+            initializer = try varDeclaration()
+        } else {
+            initializer = try expressionStatement()
+        }
+        
+        let condition = check(.SEMICOLON) ? Expr.literal(value: .bool(true)) : try expression()
+        _ = try consume(.SEMICOLON, "Expect ';' after loop condition.")
+        
+        let increment = check(.RIGHT_PAREN) ? nil : try expression()
+        _ = try consume(.RIGHT_PAREN, "Expect ')' after for clauses.")
+        
+        var body = try statement()
+        
+        if let increment = increment {
+            body = .block(statements: [body, .expr(expr: increment)])
+        }
+        
+        body = .while(condition: condition, body: body)
+        
+        if let initializer = initializer {
+            body = .block(statements: [initializer, body])
+        }
+        
+        return body
     }
     
     private func ifStatement() throws -> Stmt {
@@ -95,6 +136,15 @@ class Parser {
         let initializer = match(.EQUAL) ? try expression() : .literal(value: .null)
         _ = try consume(.SEMICOLON, "Expect ';' after variable declaration.")
         return .variable(name: name, initializer: initializer)
+    }
+    
+    private func whileStatement() throws -> Stmt {
+        _ = try consume(.LEFT_PAREN, "Expect '(' after 'while'.")
+        let condition = try expression()
+        _ = try consume(.RIGHT_PAREN, "Expect ')' after condition.")
+        let body = try statement()
+        
+        return .while(condition: condition, body: body)
     }
     
     private func expressionStatement() throws -> Stmt {

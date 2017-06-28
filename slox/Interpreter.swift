@@ -122,6 +122,10 @@ extension Stmt {
         case .variable(let name, let initializer):
             let value = try initializer.evaluate(environment: environment)
             environment.define(name: name.lexeme, value: value)
+        case .while(let cond, body: let body):
+            while try cond.evaluate(environment: environment).isTrue {
+                try body.execute(environment: environment)
+            }
         case .block(let statements):
             let blockEnvironment = Environment(enclosing: environment)
             for statement in statements {
