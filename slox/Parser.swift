@@ -82,7 +82,7 @@ class Parser {
     }
     
     private func forStatement() throws -> Stmt {
-        _ = try consume(.LEFT_PAREN, "Expect '(' after 'for'.")
+        try consume(.LEFT_PAREN, "Expect '(' after 'for'.")
         
         var initializer: Stmt?
         if match(.SEMICOLON) {
@@ -94,10 +94,10 @@ class Parser {
         }
         
         let condition = check(.SEMICOLON) ? Expr.literal(value: .bool(true)) : try expression()
-        _ = try consume(.SEMICOLON, "Expect ';' after loop condition.")
+        try consume(.SEMICOLON, "Expect ';' after loop condition.")
         
         let increment = check(.RIGHT_PAREN) ? nil : try expression()
-        _ = try consume(.RIGHT_PAREN, "Expect ')' after for clauses.")
+        try consume(.RIGHT_PAREN, "Expect ')' after for clauses.")
         
         var body = try statement()
         
@@ -115,9 +115,9 @@ class Parser {
     }
     
     private func ifStatement() throws -> Stmt {
-        _ = try consume(.LEFT_PAREN, "Expect '(' after 'if'.")
+        try consume(.LEFT_PAREN, "Expect '(' after 'if'.")
         let condition = try expression()
-        _ = try consume(.RIGHT_PAREN, "Expect ')' after if condition.")
+        try consume(.RIGHT_PAREN, "Expect ')' after if condition.")
         
         let thenBranch = try statement()
         let elseBranch = match(.ELSE) ? try statement() : nil
@@ -127,21 +127,21 @@ class Parser {
     
     private func printStatement() throws -> Stmt {
         let expr = try expression()
-        _ = try consume(.SEMICOLON, "Expect ';' after value.")
+        try consume(.SEMICOLON, "Expect ';' after value.")
         return .print(expr: expr)
     }
 
     private func varDeclaration() throws -> Stmt {
         let name = try consume(.IDENTIFIER, "Expect variable name.")
         let initializer = match(.EQUAL) ? try expression() : .literal(value: .null)
-        _ = try consume(.SEMICOLON, "Expect ';' after variable declaration.")
+        try consume(.SEMICOLON, "Expect ';' after variable declaration.")
         return .variable(name: name, initializer: initializer)
     }
     
     private func whileStatement() throws -> Stmt {
-        _ = try consume(.LEFT_PAREN, "Expect '(' after 'while'.")
+        try consume(.LEFT_PAREN, "Expect '(' after 'while'.")
         let condition = try expression()
-        _ = try consume(.RIGHT_PAREN, "Expect ')' after condition.")
+        try consume(.RIGHT_PAREN, "Expect ')' after condition.")
         let body = try statement()
         
         return .while(condition: condition, body: body)
@@ -149,7 +149,7 @@ class Parser {
     
     private func expressionStatement() throws -> Stmt {
         let expr = try expression()
-        _ = try consume(.SEMICOLON, "Expect ';' after expression.")
+        try consume(.SEMICOLON, "Expect ';' after expression.")
         return .expr(expr: expr)
     }
     
@@ -162,7 +162,7 @@ class Parser {
             }
         }
         
-        _ = try consume(.RIGHT_BRACE, "Expect '}' after block.")
+        try consume(.RIGHT_BRACE, "Expect '}' after block.")
         return statements
     }
     
@@ -277,7 +277,7 @@ class Parser {
         
         if match(.LEFT_PAREN) {
             let expr = try expression()
-            _ = try consume(.RIGHT_PAREN, "Expect ')' after expression.")
+            try consume(.RIGHT_PAREN, "Expect ')' after expression.")
             return .grouping(expr: expr)
         }
         
@@ -287,7 +287,7 @@ class Parser {
     private func match(_ types: [TokenType]) -> Bool {
         for type in types {
             if check(type) {
-                _ = advance()
+                advance()
                 return true
             }
         }
@@ -299,7 +299,7 @@ class Parser {
         return match([type])
     }
     
-    private func consume(_ type: TokenType, _ message: String) throws -> Token {
+    @discardableResult private func consume(_ type: TokenType, _ message: String) throws -> Token {
         if check(type) { return advance() }
         
         throw error(peek, message)
@@ -310,7 +310,7 @@ class Parser {
         return peek.type == tokenType
     }
     
-    private func advance() -> Token {
+    @discardableResult private func advance() -> Token {
         if !isAtEnd { current += 1 }
         return previous
     }
@@ -321,7 +321,7 @@ class Parser {
     }
     
     private func synchronize() {
-        _ = advance()
+        advance()
         while !isAtEnd {
             if (previous.type == .SEMICOLON) { return }
             
@@ -334,7 +334,7 @@ class Parser {
             case .WHILE: fallthrough
             case .PRINT: fallthrough
             case .RETURN: return
-            default: _ = advance()
+            default: advance()
             }
         }
     }

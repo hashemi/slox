@@ -115,7 +115,7 @@ class Scanner {
             
         case "/":
             if match("/") {
-                while (peek != "\n" && !isAtEnd) { _ = advance() }
+                while (peek != "\n" && !isAtEnd) { advance() }
             } else {
                 addToken(.SLASH)
             }
@@ -137,20 +137,20 @@ class Scanner {
     }
     
     private func identifier() {
-        while peek.isAlphaNumeric { _ = advance() }
+        while peek.isAlphaNumeric { advance() }
         
         let type = TokenType(keyword: currentText) ?? .IDENTIFIER
         addToken(type)
     }
     
     private func number() {
-        while peek.isDigit { _ = advance() }
+        while peek.isDigit { advance() }
         
         if peek == "." && peekNext.isDigit {
             // Consume the "."
-            _ = advance()
+            advance()
             
-            while peek.isDigit { _ = advance() }
+            while peek.isDigit { advance() }
         }
         
         addToken(.NUMBER, .number(Double(currentText)!))
@@ -159,7 +159,7 @@ class Scanner {
     private func string() {
         while (peek != "\"" && !isAtEnd) {
             if (peek == "\n") { line += 1 }
-            _ = advance()
+            advance()
         }
         
         // Unterminated string.
@@ -169,7 +169,7 @@ class Scanner {
         }
         
         // The closing ".
-        _ = advance()
+        advance()
         
         let range = source.index(after: start)..<source.index(before: current)
         let value = source[range]
@@ -184,7 +184,7 @@ class Scanner {
         return true
     }
     
-    private func advance() -> Character {
+    @discardableResult private func advance() -> Character {
         let result = source[current]
         current = source.index(after: current)
         return result
