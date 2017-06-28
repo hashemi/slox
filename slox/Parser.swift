@@ -135,24 +135,24 @@ class Parser {
     }
     
     private func or() throws -> Expr {
-        let expr = try and()
+        var expr = try and()
         
         while match(.OR) {
             let op = previous
             let right = try and()
-            return .logical(left: expr, op: op, right: right)
+            expr = .logical(left: expr, op: op, right: right)
         }
         
         return expr
     }
     
     private func and() throws -> Expr {
-        let expr = try equality()
+        var expr = try equality()
         
         while match(.AND) {
             let op = previous
             let right = try equality()
-            return .logical(left: expr, op: op, right: right)
+            expr = .logical(left: expr, op: op, right: right)
         }
         
         return expr
