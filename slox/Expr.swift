@@ -9,6 +9,7 @@
 indirect enum Expr {
     case assign(name: Token, value: Expr)
     case binary(left: Expr, op: Token, right: Expr)
+    case call(callee: Expr, paren: Token, arguments: [Expr])
     case grouping(expr: Expr)
     case literal(value: LiteralValue)
     case logical(left: Expr, op: Token, right: Expr)

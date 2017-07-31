@@ -31,7 +31,7 @@ struct Lox {
     }
     
     static func runPrompt() throws {
-        let environment = Environment()
+        let environment = Environment.globals
         while true {
             print("> ", terminator: "")
             guard let line = readLine() else { return }

@@ -99,6 +99,21 @@ extension Expr {
             // Unreachable.
             return .null
         
+        case .call(let calleeExpr, let paren, let argumentExprs):
+            let callee = try calleeExpr.evaluate(environment: environment)
+            let arguments = try argumentExprs.map { try $0.evaluate(environment: environment) }
+            
+            guard case let .callable(callable) = callee else {
+                throw RuntimeError(paren, "Can only call functions and classes.")
+            }
+            
+            guard arguments.count == callable.arity else {
+                throw RuntimeError(paren,
+                   "Expected \(callable.arity) arguments but got \(arguments.count).")
+            }
+            
+            return callable.call(environment, arguments)
+            
         case .grouping(let expr):
             return try expr.evaluate(environment: environment)
         case .variable(let name):

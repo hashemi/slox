@@ -19,6 +19,7 @@
 		EE581B071E97E6D1008C9C6C /* Interpreter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE581B061E97E6D1008C9C6C /* Interpreter.swift */; };
 		EE8023651EE281CC00A499A2 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8023641EE281CC00A499A2 /* Environment.swift */; };
 		EE89BCBC1EE09737004A7C62 /* Stmt.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE89BCBB1EE09737004A7C62 /* Stmt.swift */; };
+		EE9A58CA1F2F802A00E97907 /* Callable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE9A58C91F2F802A00E97907 /* Callable.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -47,6 +48,7 @@
 		EE581B061E97E6D1008C9C6C /* Interpreter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Interpreter.swift; sourceTree = "<group>"; };
 		EE8023641EE281CC00A499A2 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		EE89BCBB1EE09737004A7C62 /* Stmt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stmt.swift; sourceTree = "<group>"; };
+		EE9A58C91F2F802A00E97907 /* Callable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Callable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +93,7 @@
 				EE581B061E97E6D1008C9C6C /* Interpreter.swift */,
 				EE89BCBB1EE09737004A7C62 /* Stmt.swift */,
 				EE8023641EE281CC00A499A2 /* Environment.swift */,
+				EE9A58C91F2F802A00E97907 /* Callable.swift */,
 			);
 			path = slox;
 			sourceTree = "<group>";
@@ -166,6 +169,7 @@
 				EE2C42BA1E7D5D95005EAE69 /* Scanner.swift in Sources */,
 				EE2C42BE1E7DE3AE005EAE69 /* Expr.swift in Sources */,
 				EE2C42C41E82C91E005EAE69 /* LiteralValue.swift in Sources */,
+				EE9A58CA1F2F802A00E97907 /* Callable.swift in Sources */,
 				EE2C42B81E7D5D8B005EAE69 /* Token.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

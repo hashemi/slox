@@ -30,6 +30,8 @@ extension Expr {
             return name.lexeme
         case .assign(let name, let value):
             return parenthesize("= \(name)", [value])
+        case .call(let callee, _, let arguments):
+            return parenthesize("call \(callee)", arguments)
         }
     }
 }

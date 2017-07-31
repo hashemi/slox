@@ -263,7 +263,38 @@ class Parser {
             return .unary(op: op, right: right)
         }
         
-        return try primary()
+        return try call()
+    }
+    
+    private func call() throws -> Expr {
+        var expr = try primary()
+        
+        while true {
+            if match([.LEFT_PAREN]) {
+                expr = try finishCall(expr)
+            } else {
+                break
+            }
+        }
+        
+        return expr
+    }
+    
+    private func finishCall(_ callee: Expr) throws -> Expr {
+        var arguments: [Expr] = []
+        
+        if !check(.RIGHT_PAREN) {
+            repeat {
+                if arguments.count == 8 {
+                    _ = error(peek, "Cannot have more than 8 arguments.")
+                }
+                arguments.append(try expression())
+            } while match(.COMMA)
+        }
+        
+        let paren = try consume(.RIGHT_PAREN, "Expect ')' after arguments.")
+        
+        return .call(callee: callee, paren: paren, arguments: arguments)
     }
     
     private func primary() throws -> Expr {
