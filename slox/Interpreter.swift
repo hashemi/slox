@@ -162,15 +162,20 @@ extension Stmt {
                     for (par, arg) in zip(parameters, args) {
                         environment.define(name: par.lexeme, value: arg)
                     }
-                    
-                    for statement in body {
-                        try statement.execute(environment: environment)
+                    do {
+                        for statement in body {
+                            try statement.execute(environment: environment)
+                        }
+                    } catch let ret as Return {
+                        return ret.value
                     }
-                    
                     return .null
                 }
             )
             environment.define(name: name.lexeme, value: .callable(function))
+        case .return(_, let valueExpr):
+            let value = try valueExpr.evaluate(environment: environment)
+            throw Return(value)
         }
     }
 }
