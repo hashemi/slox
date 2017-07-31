@@ -48,6 +48,7 @@ extension Environment {
         var environment = Environment()
         
         environment.define(name: "clock", value: .callable(Callable(
+            name: "clock",
             arity: 0,
             call: { (env: Environment, args: [LiteralValue]) -> LiteralValue in
                 return .number(Double(CFAbsoluteTimeGetCurrent()) + 978307200.0)

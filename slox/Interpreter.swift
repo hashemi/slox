@@ -112,7 +112,7 @@ extension Expr {
                    "Expected \(callable.arity) arguments but got \(arguments.count).")
             }
             
-            return callable.call(environment, arguments)
+            return try callable.call(environment, arguments)
             
         case .grouping(let expr):
             return try expr.evaluate(environment: environment)

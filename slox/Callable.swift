@@ -7,12 +7,13 @@
 //
 
 struct Callable {
+    let name: String
     let arity: Int
-    let call: (Environment, [LiteralValue]) -> LiteralValue
+    let call: (Environment, [LiteralValue]) throws -> LiteralValue
 }
 
 extension Callable: CustomStringConvertible {
     var description: String {
-        return "function(\(arity))"
+        return "<fn \(name)>"
     }
 }
