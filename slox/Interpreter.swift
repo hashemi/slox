@@ -158,7 +158,7 @@ extension Stmt {
                 name: name.lexeme,
                 arity: parameters.count,
                 call: { (env: Environment, args: [LiteralValue]) -> LiteralValue in
-                    let environment = Environment(enclosing: .globals)
+                    let environment = Environment(enclosing: environment)
                     for (par, arg) in zip(parameters, args) {
                         environment.define(name: par.lexeme, value: arg)
                     }
