@@ -9,7 +9,7 @@ called Lox. The book is being released as chapters are completed, one chapter
 at a time.
 
 ## Progress
-As of 28 Jun 2017, this code is up to date with the book. The following chapters
+As of 31 Jul 2017, this code is up to date with the book. The following chapters
 are implemented:
 
 4. Scanning
@@ -18,16 +18,17 @@ are implemented:
 7. Evaluating Expressions
 8. Statements and State
 9. Control Flow
+10. Functions
 
 ## Tests
-As of 28 Jun 2017, the test suite is up to date with the reference Java
-implementation and all chapter 9 tests pass successfully.
+As of 31 Jul 2017, the test suite is up to date with the reference Java
+implementation and all chapter 10 tests pass successfully.
 
 To run the tests:
 
 ```shell
 $ swift build
-$ ./test_swift.py chap09_control
+$ ./test_swift.py chap10_functions
 ```
 
 ## Goals & Design
