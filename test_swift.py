@@ -11,7 +11,7 @@ SWIFT_SUITES = JAVA_SUITES
 
 def java_to_swift_interpreter(interpreter):
 	if interpreter.language == 'java':
-		interpreter.language = 'swift'
+		# interpreter.language = 'swift'
 		interpreter.args = ['.build/debug/slox']
 	return interpreter
 
