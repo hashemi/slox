@@ -153,6 +153,24 @@ extension Stmt {
             } else {
                 try elseBranch?.execute(environment: environment)
             }
+        case .function(let name, let parameters, let body):
+            let function = Callable(
+                name: name.lexeme,
+                arity: parameters.count,
+                call: { (env: Environment, args: [LiteralValue]) -> LiteralValue in
+                    let environment = Environment(enclosing: .globals)
+                    for (par, arg) in zip(parameters, args) {
+                        environment.define(name: par.lexeme, value: arg)
+                    }
+                    
+                    for statement in body {
+                        try statement.execute(environment: environment)
+                    }
+                    
+                    return .null
+                }
+            )
+            environment.define(name: name.lexeme, value: .callable(function))
         }
     }
 }

@@ -14,5 +14,6 @@ indirect enum Stmt {
     case expr(expr: Expr)
     case variable(name: Token, initializer: Expr)
     case `while`(condition: Expr, body: Stmt)
+    case function(name: Token, parameters: [Token], body: [Stmt])
     case `if`(expr: Expr, then: Stmt, else: Stmt?)
 }

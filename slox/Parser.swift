@@ -46,6 +46,10 @@ class Parser {
     
     private func declaration() throws -> Stmt? {
         do {
+            if match(.FUN) {
+                return try function("function");
+            }
+            
             if match(.VAR) {
                 return try varDeclaration()
             }
@@ -151,6 +155,27 @@ class Parser {
         let expr = try expression()
         try consume(.SEMICOLON, "Expect ';' after expression.")
         return .expr(expr: expr)
+    }
+    
+    private func function(_ kind: String) throws -> Stmt {
+        let name = try consume(.IDENTIFIER, "Expect \(kind) name.")
+        
+        try consume(.LEFT_PAREN, "Expect '(' after \(kind) name.")
+        var parameters: [Token] = []
+        if !check(.RIGHT_PAREN) {
+            repeat {
+                if parameters.count >= 8 {
+                    _ = error(peek, "Cannot have more than 8 parameters.")
+                }
+                
+                parameters.append(try consume(.IDENTIFIER, "Expect parameter name."))
+            } while match(.COMMA)
+        }
+        try consume(.RIGHT_PAREN, "Expect ')' after parameters.")
+        
+        try consume(.LEFT_BRACE, "Expect '{' before \(kind) body.");
+        let body = try block()
+        return .function(name: name, parameters: parameters, body: body)
     }
     
     private func block() throws -> [Stmt] {
