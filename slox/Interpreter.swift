@@ -120,7 +120,7 @@ extension ResolvedExpr {
             return try environment.get(name: name, at: depth)
         case .assign(let name, let value, let depth):
             let value = try value.evaluate(environment: environment)
-            environment.assign(name: name, value: value, at: depth)
+            try environment.assign(name: name, value: value, at: depth)
             return value
         }
     }
