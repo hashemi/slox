@@ -53,6 +53,8 @@ struct Lox {
             let resolver = Resolver()
             let resolvedStatements = statements.map { $0.resolve(resolver: resolver) }
             
+            if hadError { return }
+            
             for statement in resolvedStatements {
                 try statement.execute(environment: environment)
             }
