@@ -7,7 +7,13 @@
 //
 
 class Resolver {
+    enum FunctionType {
+        case none
+        case function
+    }
+    
     private var scopes: [[String: Bool]] = []
+    private(set) var currentFunction: FunctionType = .none
     
     func begin() {
         scopes.append([:])
@@ -19,6 +25,11 @@ class Resolver {
     
     func declare(_ name: Token) {
         if scopes.isEmpty { return }
+        
+        if scopes[scopes.count - 1].keys.contains(name.lexeme) {
+            Lox.error(name, "Variable with this name already declared in this scope.")
+        }
+        
         scopes[scopes.count - 1][name.lexeme] = false
     }
     
@@ -43,6 +54,24 @@ class Resolver {
         }
         return scopes.count // global
     }
+    
+    func resolveFunction(name: Token, parameters: [Token], body: [Stmt], type functionType: FunctionType) -> [ResolvedStmt] {
+        let enclosingFunction = currentFunction
+        currentFunction = functionType
+        
+        begin()
+        for param in parameters {
+            declare(param)
+            define(param)
+        }
+        
+        let resolvedBody = body.map { $0.resolve(resolver: self) }
+        end()
+        
+        currentFunction = enclosingFunction
+        
+        return resolvedBody
+    }
 }
 
 extension Stmt {
@@ -64,15 +93,7 @@ extension Stmt {
             resolver.declare(name)
             resolver.define(name)
             
-            resolver.begin()
-            for param in parameters {
-                resolver.declare(param)
-                resolver.define(param)
-            }
-            
-            let resolvedBody = body.map { $0.resolve(resolver: resolver) }
-            
-            resolver.end()
+            let resolvedBody = resolver.resolveFunction(name: name, parameters: parameters, body: body, type: .function)
             
             return .function(name: name, parameters: parameters, body: resolvedBody)
         
@@ -89,6 +110,10 @@ extension Stmt {
             return .print(expr: expr.resolve(resolver: resolver))
             
         case .return(let keyword, let value):
+            if resolver.currentFunction == .none {
+                Lox.error(keyword, "Cannot return from top-level code.")
+            }
+            
             return .return(keyword: keyword, value: value.resolve(resolver: resolver))
             
         case .while(let condition, let body):
