@@ -49,7 +49,11 @@ struct Lox {
         do {
             let statements = try parser.parse()
             if hadError { return }
-            for statement in statements {
+            
+            let resolver = Resolver()
+            let resolvedStatements = statements.map { $0.resolve(resolver: resolver) }
+            
+            for statement in resolvedStatements {
                 try statement.execute(environment: environment)
             }
         } catch let error as RuntimeError {

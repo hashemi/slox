@@ -6,8 +6,6 @@
 //  Copyright © 2017 Ahmad Alhashemi. All rights reserved.
 //
 
-import Foundation
-
 indirect enum Stmt {
     case block(statements: [Stmt])
     case print(expr: Expr)
@@ -17,4 +15,15 @@ indirect enum Stmt {
     case `while`(condition: Expr, body: Stmt)
     case function(name: Token, parameters: [Token], body: [Stmt])
     case `if`(expr: Expr, then: Stmt, else: Stmt?)
+}
+
+indirect enum ResolvedStmt {
+    case block(statements: [ResolvedStmt])
+    case print(expr: ResolvedExpr)
+    case `return`(keyword: Token, value: ResolvedExpr)
+    case expr(expr: ResolvedExpr)
+    case variable(name: Token, initializer: ResolvedExpr)
+    case `while`(condition: ResolvedExpr, body: ResolvedStmt)
+    case function(name: Token, parameters: [Token], body: [ResolvedStmt])
+    case `if`(expr: ResolvedExpr, then: ResolvedStmt, else: ResolvedStmt?)
 }

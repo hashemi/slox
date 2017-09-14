@@ -16,7 +16,7 @@ struct RuntimeError: Error {
     }
 }
 
-extension Expr {
+extension ResolvedExpr {
     func evaluate(environment: Environment) throws -> LiteralValue {
         switch self {
         case .literal(let value):
@@ -116,17 +116,17 @@ extension Expr {
             
         case .grouping(let expr):
             return try expr.evaluate(environment: environment)
-        case .variable(let name):
-            return try environment.get(name: name)
-        case .assign(let name, let value):
+        case .variable(let name, let depth):
+            return try environment.get(name: name, at: depth)
+        case .assign(let name, let value, let depth):
             let value = try value.evaluate(environment: environment)
-            try environment.assign(name: name, value: value)
+            environment.assign(name: name, value: value, at: depth)
             return value
         }
     }
 }
 
-extension Stmt {
+extension ResolvedStmt {
     func execute(environment: Environment) throws {
         switch self {
         case .expr(let expr):

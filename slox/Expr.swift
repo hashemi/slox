@@ -16,3 +16,14 @@ indirect enum Expr {
     case unary(op: Token, right: Expr)
     case variable(name: Token)
 }
+
+indirect enum ResolvedExpr {
+    case assign(name: Token, value: ResolvedExpr, depth: Int)
+    case binary(left: ResolvedExpr, op: Token, right: ResolvedExpr)
+    case call(callee: ResolvedExpr, paren: Token, arguments: [ResolvedExpr])
+    case grouping(expr: ResolvedExpr)
+    case literal(value: LiteralValue)
+    case logical(left: ResolvedExpr, op: Token, right: ResolvedExpr)
+    case unary(op: Token, right: ResolvedExpr)
+    case variable(name: Token, depth: Int)
+}

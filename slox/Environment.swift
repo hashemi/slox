@@ -20,26 +20,25 @@ class Environment {
         values[name] = value
     }
     
-    func get(name: Token) throws -> LiteralValue {
-        guard let value = values[name.lexeme] else {
-            guard let enclosing = self.enclosing else {
-                throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
-            }
-            return try enclosing.get(name: name)
+    func get(name: Token, at depth: Int) throws -> LiteralValue {
+        var environment: Environment? = self
+        for _ in 0..<depth {
+            environment = environment?.enclosing
+        }
+        
+        guard let value = environment?.values[name.lexeme] else {
+            throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
         }
         
         return value
     }
     
-    func assign(name: Token, value: LiteralValue) throws {
-        guard values.keys.contains(name.lexeme) else {
-            guard let enclosing = self.enclosing else {
-                throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
-            }
-            return try enclosing.assign(name: name, value: value)
+    func assign(name: Token, value: LiteralValue, at depth: Int) {
+        var environment: Environment? = self
+        for _ in 0..<depth {
+            environment = environment?.enclosing
         }
-        
-        values[name.lexeme] = value
+        environment?.values[name.lexeme] = value
     }
 }
 
