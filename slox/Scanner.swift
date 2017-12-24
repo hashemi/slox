@@ -34,7 +34,7 @@ extension TokenType {
     }
 }
 
-private extension Character {
+private extension UnicodeScalar {
     var isAlpha: Bool {
         return
             (self >= "a" && self <= "z") ||
@@ -55,33 +55,33 @@ class Scanner {
     private let source: String
     private var tokens: [Token] = []
     
-    private var start: String.Index
-    private var current: String.Index
+    private var start: String.UnicodeScalarIndex
+    private var current: String.UnicodeScalarIndex
     private var line = 1
     
     private var currentText: String {
-        return String(source[start..<current])
+        return String(source.unicodeScalars[start..<current])
     }
 
     private var isAtEnd: Bool {
-        return current >= source.endIndex
+        return current >= source.unicodeScalars.endIndex
     }
     
-    private var peek: Character {
-        if current >= source.endIndex { return "\0" }
-        return source[current]
+    private var peek: UnicodeScalar {
+        if current >= source.unicodeScalars.endIndex { return "\0" }
+        return source.unicodeScalars[current]
     }
     
-    private var peekNext: Character {
-        let next = source.index(after: current)
-        if next >= source.endIndex { return "\0" }
-        return source[next]
+    private var peekNext: UnicodeScalar {
+        let next = source.unicodeScalars.index(after: current)
+        if next >= source.unicodeScalars.endIndex { return "\0" }
+        return source.unicodeScalars[next]
     }
     
     init(_ source: String) {
         self.source = source
-        self.start = source.startIndex
-        self.current = source.startIndex
+        self.start = source.unicodeScalars.startIndex
+        self.current = source.unicodeScalars.startIndex
     }
     
     func scanTokens() -> [Token] {
@@ -184,9 +184,9 @@ class Scanner {
         return true
     }
     
-    @discardableResult private func advance() -> Character {
-        let result = source[current]
-        current = source.index(after: current)
+    @discardableResult private func advance() -> UnicodeScalar {
+        let result = source.unicodeScalars[current]
+        current = source.unicodeScalars.index(after: current)
         return result
     }
     
