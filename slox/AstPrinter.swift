@@ -37,6 +37,8 @@ extension Expr {
         case .set(let object, let name, let value):
             let getter = parenthesize(".\(name)", [object])
             return parenthesize("= \(getter)", [value])
+        case .this(let keyword):
+            return keyword.lexeme
         }
     }
 }

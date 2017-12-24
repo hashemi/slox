@@ -39,6 +39,11 @@ class Resolver {
         scopes[scopes.count - 1][name.lexeme] = true
     }
     
+    func defineThis() {
+        if scopes.isEmpty { return }
+        scopes[scopes.count - 1]["this"] = true
+    }
+    
     func declaredNotDefined(_ name: Token) -> Bool {
         if scopes.last?[name.lexeme] == false {
             return true
@@ -88,6 +93,9 @@ extension Stmt {
             resolver.declare(name)
             resolver.define(name)
             
+            resolver.begin()
+            resolver.defineThis()
+            
             let resolvedMethods = methods.map { (method: Stmt) -> ResolvedStmt in
                 guard case let .function(name, parameters, body) = method else {
                     // This should never happen
@@ -96,6 +104,8 @@ extension Stmt {
                 
                 return resolver.resolveFunction(name: name, parameters: parameters, body: body, type: .method)
             }
+            
+            resolver.end()
             
             return .class(name: name, methods: resolvedMethods)
             
@@ -189,6 +199,10 @@ extension Expr{
                 object: object.resolve(resolver: resolver),
                 name: name,
                 value: value.resolve(resolver: resolver))
+        
+        case .this(let keyword):
+            let depth = resolver.resolveLocal(keyword)
+            return .this(keyword: keyword, depth: depth)
         }
     }
 }

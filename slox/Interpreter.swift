@@ -134,6 +134,9 @@ extension ResolvedExpr {
             
             return value
             
+        case .this(let keyword, let depth):
+            return try environment.get(name: keyword, at: depth)
+            
         case .grouping(let expr):
             return try expr.evaluate(environment: environment)
         case .variable(let name, let depth):

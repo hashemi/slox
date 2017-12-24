@@ -366,6 +366,8 @@ class Parser {
         
         if match([.NUMBER, .STRING]) { return .literal(value: previous.literal) }
         
+        if match(.THIS) { return .this(keyword: previous) }
+        
         if match(.IDENTIFIER) { return .variable(name: previous) }
         
         if match(.LEFT_PAREN) {

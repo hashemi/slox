@@ -15,6 +15,7 @@ indirect enum Expr {
     case literal(value: LiteralValue)
     case logical(left: Expr, op: Token, right: Expr)
     case set(object: Expr, name: Token, value: Expr)
+    case this(keyword: Token)
     case unary(op: Token, right: Expr)
     case variable(name: Token)
 }
@@ -28,6 +29,7 @@ indirect enum ResolvedExpr {
     case literal(value: LiteralValue)
     case logical(left: ResolvedExpr, op: Token, right: ResolvedExpr)
     case set(object: ResolvedExpr, name: Token, value: ResolvedExpr)
+    case this(keyword: Token, depth: Int)
     case unary(op: Token, right: ResolvedExpr)
     case variable(name: Token, depth: Int)
 }
