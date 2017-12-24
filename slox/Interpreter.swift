@@ -103,7 +103,12 @@ extension ResolvedExpr {
             let callee = try calleeExpr.evaluate(environment: environment)
             let arguments = try argumentExprs.map { try $0.evaluate(environment: environment) }
             
-            guard case let .callable(callable) = callee else {
+            let callable: Callable
+            
+            switch callee {
+            case .function(let function): callable = function
+            case .class(let klass): callable = klass
+            default:
                 throw RuntimeError(paren, "Can only call functions and classes.")
             }
             
@@ -135,20 +140,17 @@ extension ResolvedExpr {
             return value
         
         case .super(_, let methodExpr, let depth):
-            guard
-                case let .callable(callable) = try environment.getSuper(at: depth),
-                let superclass = callable as? Class
-            else { fatalError("Got a non-class for 'super'.") }
+            guard case let .class(superclass) = try environment.getSuper(at: depth)
+                else { fatalError("Got a non-class for 'super'.") }
             
-            guard case let .instance(object) = environment.getThis(at: depth - 1) else {
-                fatalError("Got a non-object for 'this'.")
-            }
+            guard case let .instance(object) = environment.getThis(at: depth - 1)
+                else { fatalError("Got a non-object for 'this'.") }
             
             guard let method = superclass.find(instance: object, method: methodExpr.lexeme) else {
                 throw RuntimeError(methodExpr, "Undefined property '\(methodExpr.lexeme)'.")
             }
             
-            return .callable(method)
+            return .function(method)
         
         case .this(let keyword, let depth):
             return try environment.get(name: keyword, at: depth)
@@ -201,10 +203,8 @@ extension ResolvedStmt {
             if let superclassExpr = superclassExpr {
                 let value = try superclassExpr.evaluate(environment: environment)
                 
-                guard case let .callable(collable) = value,
-                    let klass = collable as? Class else {
-                    throw RuntimeError(name, "Superclass must be a class.")
-                }
+                guard case let .class(klass) = value
+                    else { throw RuntimeError(name, "Superclass must be a class.") }
                 
                 superclass = klass
                 
@@ -214,14 +214,13 @@ extension ResolvedStmt {
                 superclass = nil
             }
             
-            var methods: [String: Function] = [:]
+            var methods: [String: UserFunction] = [:]
             for methodExpr in methodExprs {
-                guard case let .function(name, parameters, body) = methodExpr else {
+                guard case let .function(name, parameters, body) = methodExpr
                     // This should never happen
-                    fatalError("Class declaration should only contain methods.")
-                }
+                    else { fatalError("Class declaration should only contain methods.") }
                 
-                methods[name.lexeme] = Function(
+                methods[name.lexeme] = UserFunction(
                     name: name,
                     parameters: parameters,
                     body: body,
@@ -235,7 +234,7 @@ extension ResolvedStmt {
                 environment = environment.enclosing!
             }
             
-            environment.define(name: name.lexeme, value: .callable(klass))
+            environment.define(name: name.lexeme, value: .class(klass))
         
         case .if(let condExpr, let thenBranch, let elseBranch):
             let condition = try condExpr.evaluate(environment: environment).isTrue
@@ -246,14 +245,14 @@ extension ResolvedStmt {
             }
         
         case .function(let name, let parameters, let body):
-            let callable = Function(
+            let function = UserFunction(
                 name: name,
                 parameters: parameters,
                 body: body,
                 closure: environment,
                 isInitializer: false
             )
-            environment.define(name: name.lexeme, value: .callable(callable))
+            environment.define(name: name.lexeme, value: .function(function))
         
         case .return(_, let valueExpr):
             let value = try valueExpr.evaluate(environment: environment)

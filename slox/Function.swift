@@ -6,7 +6,9 @@
 //  Copyright © 2017 Ahmad Alhashemi. All rights reserved.
 //
 
-struct Function: Callable {
+protocol Function: Callable { }
+
+struct UserFunction: Function {
     let name: Token
     let parameters: [Token]
     let body: [ResolvedStmt]
@@ -38,10 +40,10 @@ struct Function: Callable {
         return .null
     }
     
-    func bind(_ instance: Instance) -> Function {
+    func bind(_ instance: Instance) -> UserFunction {
         let environment = Environment(enclosing: closure)
         environment.define(name: "this", value: .instance(instance))
-        return Function(
+        return UserFunction(
             name: name,
             parameters: parameters,
             body: body,
@@ -49,15 +51,13 @@ struct Function: Callable {
             isInitializer: isInitializer
         )
     }
-}
 
-extension Function: CustomStringConvertible {
     var description: String {
         return "<fn \(name.lexeme)>"
     }
 }
 
-struct NativeFunction: Callable {
+struct NativeFunction: Function {
     let arity: Int
     let body: ([LiteralValue]) throws -> LiteralValue
     

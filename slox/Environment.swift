@@ -75,7 +75,7 @@ extension Environment {
         
         environment.define(
             name: "clock",
-            value: .callable(
+            value: .function(
                 NativeFunction(arity: 0) { _ in
                     return .number(Double(CFAbsoluteTimeGetCurrent()) + 978307200.0)
                 }

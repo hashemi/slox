@@ -16,15 +16,15 @@ struct Class {
     
     let name: String
     let superclass: Superclass
-    let methods: [String: Function]
+    let methods: [String: UserFunction]
     
-    init(name: String, superclass: Class?, methods: [String: Function]) {
+    init(name: String, superclass: Class?, methods: [String: UserFunction]) {
         self.name = name
         self.superclass = Superclass(superclass)
         self.methods = methods
     }
     
-    func find(instance: Instance, method: String) -> Function? {
+    func find(instance: Instance, method: String) -> UserFunction? {
         if let boundMethod = methods[method]?.bind(instance) {
             return boundMethod
         }
@@ -70,7 +70,7 @@ class Instance {
         }
         
         if let method = klass.find(instance: self, method: name.lexeme) {
-            return .callable(method)
+            return .function(method)
         }
         
         throw RuntimeError(name, "Undefined property '\(name.lexeme)'.")
