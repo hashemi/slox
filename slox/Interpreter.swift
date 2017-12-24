@@ -173,7 +173,7 @@ extension ResolvedStmt {
         case .class(let name, let methodExprs):
             environment.define(name: name.lexeme, value: .null)
             
-            var methods: [String: Callable] = [:]
+            var methods: [String: Function] = [:]
             for methodExpr in methodExprs {
                 guard case let .function(name, parameters, body) = methodExpr else {
                     // This should never happen

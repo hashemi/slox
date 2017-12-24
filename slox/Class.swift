@@ -8,10 +8,10 @@
 
 struct Class {
     let name: String
-    let methods: [String: Callable]
+    let methods: [String: Function]
     
-    func find(instance: Instance, method: String) -> Callable? {
-        return methods[method]
+    func find(instance: Instance, method: String) -> Function? {
+        return methods[method]?.bind(instance)
     }
 }
 

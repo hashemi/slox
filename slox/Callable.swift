@@ -37,6 +37,12 @@ struct Function: Callable {
         
         return .null
     }
+    
+    func bind(_ instance: Instance) -> Function {
+        let environment = Environment(enclosing: closure)
+        environment.define(name: "this", value: .instance(instance))
+        return Function(name: name, parameters: parameters, body: body, closure: environment)
+    }
 }
 
 extension Function: CustomStringConvertible {
