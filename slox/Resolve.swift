@@ -55,7 +55,7 @@ class Resolver {
         return scopes.count // global
     }
     
-    func resolveFunction(name: Token, parameters: [Token], body: [Stmt], type functionType: FunctionType) -> [ResolvedStmt] {
+    func resolveFunction(name: Token, parameters: [Token], body: [Stmt], type functionType: FunctionType) -> ResolvedStmt {
         let enclosingFunction = currentFunction
         currentFunction = functionType
         
@@ -70,7 +70,7 @@ class Resolver {
         
         currentFunction = enclosingFunction
         
-        return resolvedBody
+        return .function(name: name, parameters: parameters, body: resolvedBody)
     }
 }
 
@@ -99,9 +99,7 @@ extension Stmt {
             resolver.declare(name)
             resolver.define(name)
             
-            let resolvedBody = resolver.resolveFunction(name: name, parameters: parameters, body: body, type: .function)
-            
-            return .function(name: name, parameters: parameters, body: resolvedBody)
+            return resolver.resolveFunction(name: name, parameters: parameters, body: body, type: .function)
         
         case .expr(let expr):
             return .expr(expr: expr.resolve(resolver: resolver))
