@@ -23,6 +23,7 @@
 		EE89BCBC1EE09737004A7C62 /* Stmt.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE89BCBB1EE09737004A7C62 /* Stmt.swift */; };
 		EE9A58CA1F2F802A00E97907 /* Callable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE9A58C91F2F802A00E97907 /* Callable.swift */; };
 		EEE454731FEF7060005FA160 /* Class.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE454721FEF7060005FA160 /* Class.swift */; };
+		EEE454761FF05F0D005FA160 /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE454751FF05F0D005FA160 /* Function.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -55,6 +56,7 @@
 		EE89BCBB1EE09737004A7C62 /* Stmt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stmt.swift; sourceTree = "<group>"; };
 		EE9A58C91F2F802A00E97907 /* Callable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Callable.swift; sourceTree = "<group>"; };
 		EEE454721FEF7060005FA160 /* Class.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Class.swift; sourceTree = "<group>"; };
+		EEE454751FF05F0D005FA160 /* Function.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Function.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 				EE89BCBB1EE09737004A7C62 /* Stmt.swift */,
 				EE8023641EE281CC00A499A2 /* Environment.swift */,
 				EE9A58C91F2F802A00E97907 /* Callable.swift */,
+				EEE454751FF05F0D005FA160 /* Function.swift */,
 				EE5DDCC61F2FCCF000910FCA /* Return.swift */,
 				EE20AE891F66D823001F601F /* Resolve.swift */,
 				EEE454721FEF7060005FA160 /* Class.swift */,
@@ -178,6 +181,7 @@
 				EE2C42BA1E7D5D95005EAE69 /* Scanner.swift in Sources */,
 				EE20AE8A1F66D823001F601F /* Resolve.swift in Sources */,
 				EE2C42BE1E7DE3AE005EAE69 /* Expr.swift in Sources */,
+				EEE454761FF05F0D005FA160 /* Function.swift in Sources */,
 				EE2C42C41E82C91E005EAE69 /* LiteralValue.swift in Sources */,
 				EEE454731FEF7060005FA160 /* Class.swift in Sources */,
 				EE5DDCC71F2FCCF000910FCA /* Return.swift in Sources */,
