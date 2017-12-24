@@ -32,6 +32,11 @@ extension Expr {
             return parenthesize("= \(name)", [value])
         case .call(let callee, _, let arguments):
             return parenthesize("call \(callee)", arguments)
+        case .get(let object, let name):
+            return parenthesize(".\(name)", [object])
+        case .set(let object, let name, let value):
+            let getter = parenthesize(".\(name)", [object])
+            return parenthesize("= \(getter)", [value])
         }
     }
 }

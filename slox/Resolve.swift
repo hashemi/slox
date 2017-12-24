@@ -158,6 +158,10 @@ extension Expr{
             let resolvedArguments = arguments.map { $0.resolve(resolver: resolver) }
             
             return .call(callee: resolvedCallee, paren: paren, arguments: resolvedArguments)
+        
+        case .get(let object, let name):
+            let resolvedObject = object.resolve(resolver: resolver)
+            return .get(object: resolvedObject, name: name)
             
         case .grouping(let expr):
             return .grouping(expr: expr.resolve(resolver: resolver))
@@ -172,6 +176,11 @@ extension Expr{
             
         case .unary(let op, let right):
             return .unary(op: op, right: right.resolve(resolver: resolver))
+        case .set(let object, let name, let value):
+            return .set(
+                object: object.resolve(resolver: resolver),
+                name: name,
+                value: value.resolve(resolver: resolver))
         }
     }
 }

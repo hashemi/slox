@@ -233,6 +233,10 @@ class Parser {
                 return .assign(name: name, value: value)
             }
             
+            if case let .get(object, name) = expr {
+                return .set(object: object, name: name, value: value)
+            }
+            
             throw error(equals, "Invalid assignment target.")
         }
         
@@ -327,6 +331,9 @@ class Parser {
         while true {
             if match([.LEFT_PAREN]) {
                 expr = try finishCall(expr)
+            } else if match([.DOT]) {
+                let name = try consume(.IDENTIFIER, "Expect property name after '.'.")
+                expr = .get(object: expr, name: name)
             } else {
                 break
             }

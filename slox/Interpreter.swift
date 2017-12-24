@@ -113,6 +113,26 @@ extension ResolvedExpr {
             }
             
             return try callable.call(environment, arguments)
+        
+        case .get(let objectExpr, let name):
+            let object = try objectExpr.evaluate(environment: environment)
+            guard case let .instance(instance) = object else {
+                throw RuntimeError(name, "Only instances have properties.")
+            }
+            
+            return try instance.get(name)
+        
+        case .set(let objectExpr, let name, let valueExpr):
+            let object = try objectExpr.evaluate(environment: environment)
+            guard case let .instance(instance) = object else {
+                throw RuntimeError(name, "Only instances have fields.")
+            }
+            
+            let value = try valueExpr.evaluate(environment: environment)
+            
+            instance.set(name, value)
+            
+            return value
             
         case .grouping(let expr):
             return try expr.evaluate(environment: environment)
