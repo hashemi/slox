@@ -13,8 +13,14 @@ class Resolver {
         case method
     }
     
+    enum ClassType {
+        case none
+        case `class`
+    }
+    
     private var scopes: [[String: Bool]] = []
     private(set) var currentFunction: FunctionType = .none
+    var currentClass: ClassType = .none
     
     func begin() {
         scopes.append([:])
@@ -92,6 +98,8 @@ extension Stmt {
         case .class(let name, let methods):
             resolver.declare(name)
             resolver.define(name)
+            let enclosingClass = resolver.currentClass
+            resolver.currentClass = .class
             
             resolver.begin()
             resolver.defineThis()
@@ -106,6 +114,8 @@ extension Stmt {
             }
             
             resolver.end()
+            
+            resolver.currentClass = enclosingClass
             
             return .class(name: name, methods: resolvedMethods)
             
@@ -201,6 +211,10 @@ extension Expr{
                 value: value.resolve(resolver: resolver))
         
         case .this(let keyword):
+            if resolver.currentClass == .none {
+                Lox.error(keyword, "Cannot use 'this' outside of a class.")
+            }
+            
             let depth = resolver.resolveLocal(keyword)
             return .this(keyword: keyword, depth: depth)
         }
