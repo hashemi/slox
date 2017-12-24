@@ -8,6 +8,11 @@
 
 struct Class {
     let name: String
+    let methods: [String: Callable]
+    
+    func find(instance: Instance, method: String) -> Callable? {
+        return methods[method]
+    }
 }
 
 extension Class: CustomStringConvertible {
@@ -25,10 +30,15 @@ class Instance {
     }
     
     func get(_ name: Token) throws -> LiteralValue {
-        guard let value = fields[name.lexeme] else {
-            throw RuntimeError(name, "Undefined property '\(name.lexeme)'.")
+        if let value = fields[name.lexeme] {
+            return value
         }
-        return value
+        
+        if let method = klass.find(instance: self, method: name.lexeme) {
+            return .callable(method)
+        }
+        
+        throw RuntimeError(name, "Undefined property '\(name.lexeme)'.")
     }
     
     func set(_ name: Token, _ value: LiteralValue) {

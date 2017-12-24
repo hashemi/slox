@@ -146,6 +146,29 @@ extension ResolvedExpr {
     }
 }
 
+extension Callable {
+    init(name: Token, parameters: [Token], body: [ResolvedStmt], environment: Environment) {
+        self.init(
+            name: name.lexeme,
+            arity: parameters.count,
+            call: { (env: Environment, args: [LiteralValue]) -> LiteralValue in
+                let environment = Environment(enclosing: environment)
+                for (par, arg) in zip(parameters, args) {
+                    environment.define(name: par.lexeme, value: arg)
+                }
+                do {
+                    for statement in body {
+                        try statement.execute(environment: environment)
+                    }
+                } catch let ret as Return {
+                    return ret.value
+                }
+                return .null
+            }
+        )
+    }
+}
+
 extension ResolvedStmt {
     func execute(environment: Environment) throws {
         switch self {
@@ -166,9 +189,21 @@ extension ResolvedStmt {
             for statement in statements {
                 try statement.execute(environment: blockEnvironment)
             }
-        case .class(let name, let methods):
+
+        case .class(let name, let methodExprs):
             environment.define(name: name.lexeme, value: .null)
-            let klass = Class(name: name.lexeme)
+            
+            var methods: [String: Callable] = [:]
+            for methodExpr in methodExprs {
+                guard case let .function(name, parameters, body) = methodExpr else {
+                    // This should never happen
+                    fatalError("Class declaration should only contain methods.")
+                }
+                
+                methods[name.lexeme] = Callable(name: name, parameters: parameters, body: body, environment: environment)
+            }
+            
+            let klass = Class(name: name.lexeme, methods: methods)
             
             let callable = Callable(
                 name: name.lexeme,
@@ -188,25 +223,8 @@ extension ResolvedStmt {
                 try elseBranch?.execute(environment: environment)
             }
         case .function(let name, let parameters, let body):
-            let function = Callable(
-                name: name.lexeme,
-                arity: parameters.count,
-                call: { (env: Environment, args: [LiteralValue]) -> LiteralValue in
-                    let environment = Environment(enclosing: environment)
-                    for (par, arg) in zip(parameters, args) {
-                        environment.define(name: par.lexeme, value: arg)
-                    }
-                    do {
-                        for statement in body {
-                            try statement.execute(environment: environment)
-                        }
-                    } catch let ret as Return {
-                        return ret.value
-                    }
-                    return .null
-                }
-            )
-            environment.define(name: name.lexeme, value: .callable(function))
+            let callable = Callable(name: name, parameters: parameters, body: body, environment: environment)
+            environment.define(name: name.lexeme, value: .callable(callable))
         case .return(_, let valueExpr):
             let value = try valueExpr.evaluate(environment: environment)
             throw Return(value)

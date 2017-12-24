@@ -10,6 +10,7 @@ class Resolver {
     enum FunctionType {
         case none
         case function
+        case method
     }
     
     private var scopes: [[String: Bool]] = []
@@ -86,7 +87,16 @@ extension Stmt {
         case .class(let name, let methods):
             resolver.declare(name)
             resolver.define(name)
-            let resolvedMethods = methods.map { $0.resolve(resolver: resolver) }
+            
+            let resolvedMethods = methods.map { (method: Stmt) -> ResolvedStmt in
+                guard case let .function(name, parameters, body) = method else {
+                    // This should never happen
+                    fatalError("Class declaration can only contain methods.")
+                }
+                
+                return resolver.resolveFunction(name: name, parameters: parameters, body: body, type: .method)
+            }
+            
             return .class(name: name, methods: resolvedMethods)
             
         case .variable(let name, let initializer):
