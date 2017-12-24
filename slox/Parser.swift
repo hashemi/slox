@@ -51,7 +51,7 @@ class Parser {
             }
             
             if match(.fun) {
-                return try function("function");
+                return try function("function")
             }
             
             if match(.var) {
@@ -212,7 +212,7 @@ class Parser {
         }
         try consume(.rightParen, "Expect ')' after parameters.")
         
-        try consume(.leftBrace, "Expect '{' before \(kind) body.");
+        try consume(.leftBrace, "Expect '{' before \(kind) body.")
         let body = try block()
         return .function(name: name, parameters: parameters, body: body)
     }
@@ -232,7 +232,6 @@ class Parser {
     
     private func assignment() throws -> Expr {
         let expr = try or()
-        
         
         if match(.equal) {
             let equals = previous
@@ -434,17 +433,10 @@ class Parser {
     private func synchronize() {
         advance()
         while !isAtEnd {
-            if (previous.type == .semicolon) { return }
+            if previous.type == .semicolon { return }
             
-            switch (peek.type) {
-            case .class: fallthrough
-            case .fun: fallthrough
-            case .var: fallthrough
-            case .for: fallthrough
-            case .if: fallthrough
-            case .while: fallthrough
-            case .print: fallthrough
-            case .return: return
+            switch peek.type {
+            case .class, .fun, .var, .for, .if, .while, .print, .return: return
             default: advance()
             }
         }

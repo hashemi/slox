@@ -85,7 +85,7 @@ class Scanner {
     }
     
     func scanTokens() -> [Token] {
-        while (!isAtEnd) {
+        while !isAtEnd {
             start = current
             scanToken()
         }
@@ -96,7 +96,7 @@ class Scanner {
     
     private func scanToken() {
         let c = advance()
-        switch (c) {
+        switch c {
         case "(": addToken(.leftParen)
         case ")": addToken(.rightParen)
         case "{": addToken(.leftBrace)
@@ -115,7 +115,7 @@ class Scanner {
             
         case "/":
             if match("/") {
-                while (peek != "\n" && !isAtEnd) { advance() }
+                while peek != "\n" && !isAtEnd { advance() }
             } else {
                 addToken(.slash)
             }
@@ -157,13 +157,13 @@ class Scanner {
     }
     
     private func string() {
-        while (peek != "\"" && !isAtEnd) {
-            if (peek == "\n") { line += 1 }
+        while peek != "\"" && !isAtEnd {
+            if peek == "\n" { line += 1 }
             advance()
         }
         
         // Unterminated string.
-        if (isAtEnd) {
+        if isAtEnd {
             Lox.error(line, "Unterminated string.")
             return
         }

@@ -61,7 +61,7 @@ class Environment {
             environment = environment?.enclosing
         }
         
-        guard let _ = environment?.values[name.lexeme] else {
+        guard environment?.values[name.lexeme] != nil else {
             throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
         }
         

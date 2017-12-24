@@ -134,13 +134,13 @@ extension ResolvedExpr {
             
             return value
         
-        case .super(let keyword, let methodExpr, let depth):
+        case .super(_, let methodExpr, let depth):
             guard
                 case let .callable(callable) = try environment.getSuper(at: depth),
                 let superclass = callable as? Class
             else { fatalError("Got a non-class for 'super'.") }
             
-            guard case let .instance(object) = try environment.getThis(at: depth - 1) else {
+            guard case let .instance(object) = environment.getThis(at: depth - 1) else {
                 fatalError("Got a non-object for 'this'.")
             }
             
@@ -155,8 +155,10 @@ extension ResolvedExpr {
             
         case .grouping(let expr):
             return try expr.evaluate(environment: environment)
+        
         case .variable(let name, let depth):
             return try environment.get(name: name, at: depth)
+        
         case .assign(let name, let value, let depth):
             let value = try value.evaluate(environment: environment)
             try environment.assign(name: name, value: value, at: depth)
@@ -170,16 +172,20 @@ extension ResolvedStmt {
         switch self {
         case .expr(let expr):
             _ = try expr.evaluate(environment: environment)
+        
         case .print(let expr):
             let value = try expr.evaluate(environment: environment)
             Swift.print(value)
+        
         case .variable(let name, let initializer):
             let value = try initializer.evaluate(environment: environment)
             environment.define(name: name.lexeme, value: value)
+        
         case .while(let cond, body: let body):
             while try cond.evaluate(environment: environment).isTrue {
                 try body.execute(environment: environment)
             }
+        
         case .block(let statements):
             let blockEnvironment = Environment(enclosing: environment)
             for statement in statements {
@@ -215,7 +221,12 @@ extension ResolvedStmt {
                     fatalError("Class declaration should only contain methods.")
                 }
                 
-                methods[name.lexeme] = Function(name: name, parameters: parameters, body: body, closure: environment, isInitializer: name.lexeme == "init")
+                methods[name.lexeme] = Function(
+                    name: name,
+                    parameters: parameters,
+                    body: body,
+                    closure: environment,
+                    isInitializer: name.lexeme == "init")
             }
             
             let klass = Class(name: name.lexeme, superclass: superclass, methods: methods)
@@ -225,6 +236,7 @@ extension ResolvedStmt {
             }
             
             environment.define(name: name.lexeme, value: .callable(klass))
+        
         case .if(let condExpr, let thenBranch, let elseBranch):
             let condition = try condExpr.evaluate(environment: environment).isTrue
             if condition {
@@ -232,9 +244,17 @@ extension ResolvedStmt {
             } else {
                 try elseBranch?.execute(environment: environment)
             }
+        
         case .function(let name, let parameters, let body):
-            let callable = Function(name: name, parameters: parameters, body: body, closure: environment, isInitializer: false)
+            let callable = Function(
+                name: name,
+                parameters: parameters,
+                body: body,
+                closure: environment,
+                isInitializer: false
+            )
             environment.define(name: name.lexeme, value: .callable(callable))
+        
         case .return(_, let valueExpr):
             let value = try valueExpr.evaluate(environment: environment)
             throw Return(value)

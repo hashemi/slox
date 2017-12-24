@@ -26,7 +26,7 @@ extension LiteralValue {
 }
 
 extension LiteralValue: Equatable {
-    static func ==(lhs: LiteralValue, rhs: LiteralValue) -> Bool {
+    static func == (lhs: LiteralValue, rhs: LiteralValue) -> Bool {
         switch (lhs, rhs) {
         case (.null, .null):
             return true

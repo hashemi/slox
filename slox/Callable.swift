@@ -46,7 +46,13 @@ struct Function: Callable {
     func bind(_ instance: Instance) -> Function {
         let environment = Environment(enclosing: closure)
         environment.define(name: "this", value: .instance(instance))
-        return Function(name: name, parameters: parameters, body: body, closure: environment, isInitializer: isInitializer)
+        return Function(
+            name: name,
+            parameters: parameters,
+            body: body,
+            closure: environment,
+            isInitializer: isInitializer
+        )
     }
 }
 

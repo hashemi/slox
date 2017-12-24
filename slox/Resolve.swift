@@ -189,7 +189,7 @@ extension Stmt {
     }
 }
 
-extension Expr{
+extension Expr {
     func resolve(resolver: Resolver) -> ResolvedExpr {
         switch self {
         case .variable(let name):
@@ -235,6 +235,7 @@ extension Expr{
             
         case .unary(let op, let right):
             return .unary(op: op, right: right.resolve(resolver: resolver))
+        
         case .set(let object, let name, let value):
             return .set(
                 object: object.resolve(resolver: resolver),

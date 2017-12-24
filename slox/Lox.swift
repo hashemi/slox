@@ -70,7 +70,7 @@ struct Lox {
     }
     
     static func report(_ line: Int, _ `where`: String, _ message: String) {
-        fputs("[line \(line)] Error\(`where`): \(message)\n",  __stderrp)
+        fputs("[line \(line)] Error\(`where`): \(message)\n", __stderrp)
         hadError = true
     }
     
