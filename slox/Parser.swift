@@ -13,7 +13,7 @@ class Parser {
     var current = 0
     
     private var isAtEnd: Bool {
-        return peek.type == .EOF
+        return peek.type == .eof
     }
     
     private var peek: Token {
@@ -46,15 +46,15 @@ class Parser {
     
     private func declaration() throws -> Stmt? {
         do {
-            if match(.CLASS) {
+            if match(.class) {
                 return try classDeclaration()
             }
             
-            if match(.FUN) {
+            if match(.fun) {
                 return try function("function");
             }
             
-            if match(.VAR) {
+            if match(.var) {
                 return try varDeclaration()
             }
             
@@ -66,50 +66,50 @@ class Parser {
     }
     
     private func classDeclaration() throws -> Stmt {
-        let name = try consume(.IDENTIFIER, "Expect class name.")
+        let name = try consume(.identifier, "Expect class name.")
         
         let superclass: Expr?
-        if match(.LESS) {
-            try consume(.IDENTIFIER, "Expect superclass name.")
+        if match(.less) {
+            try consume(.identifier, "Expect superclass name.")
             superclass = Expr.variable(name: previous)
         } else {
             superclass = nil
         }
         
-        try consume(.LEFT_BRACE, "Expect '{' before class body.")
+        try consume(.leftBrace, "Expect '{' before class body.")
         
         var methods: [Stmt] = []
-        while !check(.RIGHT_BRACE) && !isAtEnd {
+        while !check(.rightBrace) && !isAtEnd {
             try methods.append(function("method"))
         }
         
-        try consume(.RIGHT_BRACE, "Expect '}' after class body.")
+        try consume(.rightBrace, "Expect '}' after class body.")
         
         return .class(name: name, superclass: superclass, methods: methods)
     }
     
     private func statement() throws -> Stmt {
-        if match(.FOR) {
+        if match(.for) {
             return try forStatement()
         }
         
-        if match(.IF) {
+        if match(.if) {
             return try ifStatement()
         }
         
-        if match(.PRINT) {
+        if match(.print) {
             return try printStatement()
         }
         
-        if match(.RETURN) {
+        if match(.return) {
             return try returnStatement()
         }
         
-        if match(.WHILE) {
+        if match(.while) {
             return try whileStatement()
         }
         
-        if match(.LEFT_BRACE) {
+        if match(.leftBrace) {
             return .block(statements: try block())
         }
         
@@ -117,22 +117,22 @@ class Parser {
     }
     
     private func forStatement() throws -> Stmt {
-        try consume(.LEFT_PAREN, "Expect '(' after 'for'.")
+        try consume(.leftParen, "Expect '(' after 'for'.")
         
         var initializer: Stmt?
-        if match(.SEMICOLON) {
+        if match(.semicolon) {
             initializer = nil
-        } else if match(.VAR) {
+        } else if match(.var) {
             initializer = try varDeclaration()
         } else {
             initializer = try expressionStatement()
         }
         
-        let condition = check(.SEMICOLON) ? Expr.literal(value: .bool(true)) : try expression()
-        try consume(.SEMICOLON, "Expect ';' after loop condition.")
+        let condition = check(.semicolon) ? Expr.literal(value: .bool(true)) : try expression()
+        try consume(.semicolon, "Expect ';' after loop condition.")
         
-        let increment = check(.RIGHT_PAREN) ? nil : try expression()
-        try consume(.RIGHT_PAREN, "Expect ')' after for clauses.")
+        let increment = check(.rightParen) ? nil : try expression()
+        try consume(.rightParen, "Expect ')' after for clauses.")
         
         var body = try statement()
         
@@ -150,41 +150,41 @@ class Parser {
     }
     
     private func ifStatement() throws -> Stmt {
-        try consume(.LEFT_PAREN, "Expect '(' after 'if'.")
+        try consume(.leftParen, "Expect '(' after 'if'.")
         let condition = try expression()
-        try consume(.RIGHT_PAREN, "Expect ')' after if condition.")
+        try consume(.rightParen, "Expect ')' after if condition.")
         
         let thenBranch = try statement()
-        let elseBranch = match(.ELSE) ? try statement() : nil
+        let elseBranch = match(.else) ? try statement() : nil
         
         return .if(expr: condition, then: thenBranch, else: elseBranch)
     }
     
     private func printStatement() throws -> Stmt {
         let expr = try expression()
-        try consume(.SEMICOLON, "Expect ';' after value.")
+        try consume(.semicolon, "Expect ';' after value.")
         return .print(expr: expr)
     }
     
     private func returnStatement() throws -> Stmt {
         let keyword = previous
-        let value: Expr = check(.SEMICOLON) ? .literal(value: .null) : try expression()
+        let value: Expr = check(.semicolon) ? .literal(value: .null) : try expression()
         
-        try consume(.SEMICOLON, "Expect ';' after return value.")
+        try consume(.semicolon, "Expect ';' after return value.")
         return .return(keyword: keyword, value: value)
     }
 
     private func varDeclaration() throws -> Stmt {
-        let name = try consume(.IDENTIFIER, "Expect variable name.")
-        let initializer = match(.EQUAL) ? try expression() : .literal(value: .null)
-        try consume(.SEMICOLON, "Expect ';' after variable declaration.")
+        let name = try consume(.identifier, "Expect variable name.")
+        let initializer = match(.equal) ? try expression() : .literal(value: .null)
+        try consume(.semicolon, "Expect ';' after variable declaration.")
         return .variable(name: name, initializer: initializer)
     }
     
     private func whileStatement() throws -> Stmt {
-        try consume(.LEFT_PAREN, "Expect '(' after 'while'.")
+        try consume(.leftParen, "Expect '(' after 'while'.")
         let condition = try expression()
-        try consume(.RIGHT_PAREN, "Expect ')' after condition.")
+        try consume(.rightParen, "Expect ')' after condition.")
         let body = try statement()
         
         return .while(condition: condition, body: body)
@@ -192,27 +192,27 @@ class Parser {
     
     private func expressionStatement() throws -> Stmt {
         let expr = try expression()
-        try consume(.SEMICOLON, "Expect ';' after expression.")
+        try consume(.semicolon, "Expect ';' after expression.")
         return .expr(expr: expr)
     }
     
     private func function(_ kind: String) throws -> Stmt {
-        let name = try consume(.IDENTIFIER, "Expect \(kind) name.")
+        let name = try consume(.identifier, "Expect \(kind) name.")
         
-        try consume(.LEFT_PAREN, "Expect '(' after \(kind) name.")
+        try consume(.leftParen, "Expect '(' after \(kind) name.")
         var parameters: [Token] = []
-        if !check(.RIGHT_PAREN) {
+        if !check(.rightParen) {
             repeat {
                 if parameters.count >= 8 {
                     _ = error(peek, "Cannot have more than 8 parameters.")
                 }
                 
-                parameters.append(try consume(.IDENTIFIER, "Expect parameter name."))
-            } while match(.COMMA)
+                parameters.append(try consume(.identifier, "Expect parameter name."))
+            } while match(.comma)
         }
-        try consume(.RIGHT_PAREN, "Expect ')' after parameters.")
+        try consume(.rightParen, "Expect ')' after parameters.")
         
-        try consume(.LEFT_BRACE, "Expect '{' before \(kind) body.");
+        try consume(.leftBrace, "Expect '{' before \(kind) body.");
         let body = try block()
         return .function(name: name, parameters: parameters, body: body)
     }
@@ -220,13 +220,13 @@ class Parser {
     private func block() throws -> [Stmt] {
         var statements: [Stmt] = []
         
-        while !check(.RIGHT_BRACE) && !isAtEnd {
+        while !check(.rightBrace) && !isAtEnd {
             if let statement = try declaration() {
                 statements.append(statement)
             }
         }
         
-        try consume(.RIGHT_BRACE, "Expect '}' after block.")
+        try consume(.rightBrace, "Expect '}' after block.")
         return statements
     }
     
@@ -234,7 +234,7 @@ class Parser {
         let expr = try or()
         
         
-        if match(.EQUAL) {
+        if match(.equal) {
             let equals = previous
             let value = try assignment()
             
@@ -255,7 +255,7 @@ class Parser {
     private func or() throws -> Expr {
         var expr = try and()
         
-        while match(.OR) {
+        while match(.or) {
             let op = previous
             let right = try and()
             expr = .logical(left: expr, op: op, right: right)
@@ -267,7 +267,7 @@ class Parser {
     private func and() throws -> Expr {
         var expr = try equality()
         
-        while match(.AND) {
+        while match(.and) {
             let op = previous
             let right = try equality()
             expr = .logical(left: expr, op: op, right: right)
@@ -279,7 +279,7 @@ class Parser {
     private func equality() throws -> Expr {
         var expr = try comparison()
         
-        while match([.BANG_EQUAL, .EQUAL_EQUAL]) {
+        while match([.bangEqual, .equalEqual]) {
             let op = previous
             let right = try comparison()
             expr = .binary(left: expr, op: op, right: right)
@@ -291,7 +291,7 @@ class Parser {
     private func comparison() throws -> Expr {
         var expr = try term()
         
-        while match([.GREATER, .GREATER_EQUAL, .LESS, .LESS_EQUAL]) {
+        while match([.greater, .greaterEqual, .less, .lessEqual]) {
             let op = previous
             let right = try term()
             expr = .binary(left: expr, op: op, right: right)
@@ -303,7 +303,7 @@ class Parser {
     private func term() throws -> Expr {
         var expr = try factor()
         
-        while match([.MINUS, .PLUS]) {
+        while match([.minus, .plus]) {
             let op = previous
             let right = try factor()
             expr = .binary(left: expr, op: op, right: right)
@@ -315,7 +315,7 @@ class Parser {
     private func factor() throws -> Expr {
         var expr = try unary()
         
-        while match([.SLASH, .STAR]) {
+        while match([.slash, .star]) {
             let op = previous
             let right = try unary()
             expr = .binary(left: expr, op: op, right: right)
@@ -325,7 +325,7 @@ class Parser {
     }
     
     private func unary() throws -> Expr {
-        if match([.BANG, .MINUS]) {
+        if match([.bang, .minus]) {
             let op = previous
             let right = try unary()
             return .unary(op: op, right: right)
@@ -338,10 +338,10 @@ class Parser {
         var expr = try primary()
         
         while true {
-            if match([.LEFT_PAREN]) {
+            if match([.leftParen]) {
                 expr = try finishCall(expr)
-            } else if match([.DOT]) {
-                let name = try consume(.IDENTIFIER, "Expect property name after '.'.")
+            } else if match([.dot]) {
+                let name = try consume(.identifier, "Expect property name after '.'.")
                 expr = .get(object: expr, name: name)
             } else {
                 break
@@ -354,41 +354,41 @@ class Parser {
     private func finishCall(_ callee: Expr) throws -> Expr {
         var arguments: [Expr] = []
         
-        if !check(.RIGHT_PAREN) {
+        if !check(.rightParen) {
             repeat {
                 if arguments.count == 8 {
                     _ = error(peek, "Cannot have more than 8 arguments.")
                 }
                 arguments.append(try expression())
-            } while match(.COMMA)
+            } while match(.comma)
         }
         
-        let paren = try consume(.RIGHT_PAREN, "Expect ')' after arguments.")
+        let paren = try consume(.rightParen, "Expect ')' after arguments.")
         
         return .call(callee: callee, paren: paren, arguments: arguments)
     }
     
     private func primary() throws -> Expr {
-        if match(.FALSE) { return .literal(value: .bool(false)) }
-        if match(.TRUE) { return .literal(value: .bool(true)) }
-        if match(.NIL) { return .literal(value: .null) }
+        if match(.false) { return .literal(value: .bool(false)) }
+        if match(.true) { return .literal(value: .bool(true)) }
+        if match(.nil) { return .literal(value: .null) }
         
-        if match([.NUMBER, .STRING]) { return .literal(value: previous.literal) }
+        if match([.number, .string]) { return .literal(value: previous.literal) }
         
-        if match(.SUPER) {
+        if match(.super) {
             let keyword = previous
-            try consume(.DOT, "Expect '.' after 'super'.")
-            let method = try consume(.IDENTIFIER, "Expect superclass method name.")
+            try consume(.dot, "Expect '.' after 'super'.")
+            let method = try consume(.identifier, "Expect superclass method name.")
             return .super(keyword: keyword, method: method)
         }
         
-        if match(.THIS) { return .this(keyword: previous) }
+        if match(.this) { return .this(keyword: previous) }
         
-        if match(.IDENTIFIER) { return .variable(name: previous) }
+        if match(.identifier) { return .variable(name: previous) }
         
-        if match(.LEFT_PAREN) {
+        if match(.leftParen) {
             let expr = try expression()
-            try consume(.RIGHT_PAREN, "Expect ')' after expression.")
+            try consume(.rightParen, "Expect ')' after expression.")
             return .grouping(expr: expr)
         }
         
@@ -434,17 +434,17 @@ class Parser {
     private func synchronize() {
         advance()
         while !isAtEnd {
-            if (previous.type == .SEMICOLON) { return }
+            if (previous.type == .semicolon) { return }
             
             switch (peek.type) {
-            case .CLASS: fallthrough
-            case .FUN: fallthrough
-            case .VAR: fallthrough
-            case .FOR: fallthrough
-            case .IF: fallthrough
-            case .WHILE: fallthrough
-            case .PRINT: fallthrough
-            case .RETURN: return
+            case .class: fallthrough
+            case .fun: fallthrough
+            case .var: fallthrough
+            case .for: fallthrough
+            case .if: fallthrough
+            case .while: fallthrough
+            case .print: fallthrough
+            case .return: return
             default: advance()
             }
         }

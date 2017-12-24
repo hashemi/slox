@@ -9,22 +9,22 @@
 extension TokenType {
     init?(keyword: String) {
         let keywords: [String: TokenType] = [
-            "and": .AND,
-            "class": .CLASS,
-            "else": .ELSE,
-            "false": .FALSE,
-            "for": .FOR,
-            "fun": .FUN,
-            "if": .IF,
-            "nil": .NIL,
-            "or": .OR,
-            "print": .PRINT,
-            "return": .RETURN,
-            "super": .SUPER,
-            "this": .THIS,
-            "true": .TRUE,
-            "var": .VAR,
-            "while": .WHILE
+            "and": .and,
+            "class": .class,
+            "else": .else,
+            "false": .false,
+            "for": .for,
+            "fun": .fun,
+            "if": .if,
+            "nil": .nil,
+            "or": .or,
+            "print": .print,
+            "return": .return,
+            "super": .super,
+            "this": .this,
+            "true": .true,
+            "var": .var,
+            "while": .while
         ]
         
         guard let type = keywords[keyword]
@@ -90,34 +90,34 @@ class Scanner {
             scanToken()
         }
         
-        tokens.append(Token(.EOF, "", .null, line))
+        tokens.append(Token(.eof, "", .null, line))
         return tokens
     }
     
     private func scanToken() {
         let c = advance()
         switch (c) {
-        case "(": addToken(.LEFT_PAREN)
-        case ")": addToken(.RIGHT_PAREN)
-        case "{": addToken(.LEFT_BRACE)
-        case "}": addToken(.RIGHT_BRACE)
-        case ",": addToken(.COMMA)
-        case ".": addToken(.DOT)
-        case "-": addToken(.MINUS)
-        case "+": addToken(.PLUS)
-        case ";": addToken(.SEMICOLON)
-        case "*": addToken(.STAR)
-        case "!": addToken(match("=") ? .BANG_EQUAL : .BANG)
-        case "=": addToken(match("=") ? .EQUAL_EQUAL : .EQUAL)
-        case "<": addToken(match("=") ? .LESS_EQUAL : .LESS)
-        case ">": addToken(match("=") ? .GREATER_EQUAL : .GREATER)
+        case "(": addToken(.leftParen)
+        case ")": addToken(.rightParen)
+        case "{": addToken(.leftBrace)
+        case "}": addToken(.rightBrace)
+        case ",": addToken(.comma)
+        case ".": addToken(.dot)
+        case "-": addToken(.minus)
+        case "+": addToken(.plus)
+        case ";": addToken(.semicolon)
+        case "*": addToken(.star)
+        case "!": addToken(match("=") ? .bangEqual : .bang)
+        case "=": addToken(match("=") ? .equalEqual : .equal)
+        case "<": addToken(match("=") ? .lessEqual : .less)
+        case ">": addToken(match("=") ? .greaterEqual : .greater)
         case "\"": string()
             
         case "/":
             if match("/") {
                 while (peek != "\n" && !isAtEnd) { advance() }
             } else {
-                addToken(.SLASH)
+                addToken(.slash)
             }
             
         // Ignore whitespace.
@@ -139,7 +139,7 @@ class Scanner {
     private func identifier() {
         while peek.isAlphaNumeric { advance() }
         
-        let type = TokenType(keyword: currentText) ?? .IDENTIFIER
+        let type = TokenType(keyword: currentText) ?? .identifier
         addToken(type)
     }
     
@@ -153,7 +153,7 @@ class Scanner {
             while peek.isDigit { advance() }
         }
         
-        addToken(.NUMBER, .number(Double(currentText)!))
+        addToken(.number, .number(Double(currentText)!))
     }
     
     private func string() {
@@ -173,7 +173,7 @@ class Scanner {
         
         let range = source.index(after: start)..<source.index(before: current)
         let value = source[range]
-        addToken(.STRING, .string(String(value)))
+        addToken(.string, .string(String(value)))
     }
     
     private func match(_ expected: Character) -> Bool {

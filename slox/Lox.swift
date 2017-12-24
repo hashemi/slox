@@ -75,7 +75,7 @@ struct Lox {
     }
     
     static func error(_ token: Token, _ message: String) {
-        if token.type == .EOF {
+        if token.type == .eof {
             report(token.line, " at end", message)
         } else {
             report(token.line, " at '\(token.lexeme)'", message)

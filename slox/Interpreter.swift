@@ -25,7 +25,7 @@ extension ResolvedExpr {
         case .logical(let leftExpr, let op, let rightExpr):
             let left = try leftExpr.evaluate(environment: environment)
             
-            if op.type == .OR {
+            if op.type == .or {
                 if left.isTrue { return left }
             } else {
                 if !left.isTrue { return left }
@@ -37,9 +37,9 @@ extension ResolvedExpr {
             let right = try rightExpr.evaluate(environment: environment)
             
             switch op.type {
-            case .BANG:
+            case .bang:
                 return .bool(!right.isTrue)
-            case .MINUS:
+            case .minus:
                 guard case let .number(rightNumber) = right
                     else { throw RuntimeError(op, "Operand must be a number.") }
                 
@@ -57,21 +57,21 @@ extension ResolvedExpr {
             if case let .number(leftNumber) = left,
                 case let .number(rightNumber) = right {
                 switch op.type {
-                case .PLUS:
+                case .plus:
                     return .number(leftNumber + rightNumber)
-                case .MINUS:
+                case .minus:
                     return .number(leftNumber - rightNumber)
-                case .SLASH:
+                case .slash:
                     return .number(leftNumber / rightNumber)
-                case .STAR:
+                case .star:
                     return .number(leftNumber * rightNumber)
-                case .GREATER:
+                case .greater:
                     return .bool(leftNumber > rightNumber)
-                case .GREATER_EQUAL:
+                case .greaterEqual:
                     return .bool(leftNumber >= rightNumber)
-                case .LESS:
+                case .less:
                     return .bool(leftNumber < rightNumber)
-                case .LESS_EQUAL:
+                case .lessEqual:
                     return .bool(leftNumber <= rightNumber)
                 default: break
                 }
@@ -79,19 +79,19 @@ extension ResolvedExpr {
             
             if case let .string(leftString) = left,
                 case let .string(rightString) = right,
-                case .PLUS = op.type {
+                case .plus = op.type {
                 return .string(leftString + rightString)
             }
             
             switch op.type {
-            case .BANG_EQUAL: return .bool(left != right)
-            case .EQUAL_EQUAL: return .bool(left == right)
+            case .bangEqual: return .bool(left != right)
+            case .equalEqual: return .bool(left == right)
             
             // By the time we got here, all correct binary operators with correct value
             // types are handled. Next handle correct operators with incorrect types.
-            case .PLUS:
+            case .plus:
                 throw RuntimeError(op, "Operands must be two numbers or two strings.")
-            case .MINUS, .SLASH, .STAR, .GREATER, .GREATER_EQUAL, .LESS, .LESS_EQUAL:
+            case .minus, .slash, .star, .greater, .greaterEqual, .less, .lessEqual:
                 throw RuntimeError(op, "Operands must be numbers.")
             default: break
             }
