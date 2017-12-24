@@ -133,7 +133,23 @@ extension ResolvedExpr {
             instance.set(name, value)
             
             return value
+        
+        case .super(let keyword, let methodExpr, let depth):
+            guard
+                case let .callable(callable) = try environment.getSuper(at: depth),
+                let superclass = callable as? Class
+            else { fatalError("Got a non-class for 'super'.") }
             
+            guard case let .instance(object) = try environment.getThis(at: depth - 1) else {
+                fatalError("Got a non-object for 'this'.")
+            }
+            
+            guard let method = superclass.find(instance: object, method: methodExpr.lexeme) else {
+                throw RuntimeError(methodExpr, "Undefined property '\(methodExpr.lexeme)'.")
+            }
+            
+            return .callable(method)
+        
         case .this(let keyword, let depth):
             return try environment.get(name: keyword, at: depth)
             
@@ -170,8 +186,27 @@ extension ResolvedStmt {
                 try statement.execute(environment: blockEnvironment)
             }
 
-        case .class(let name, let methodExprs):
+        case .class(let name, let superclassExpr, let methodExprs):
+            var environment = environment
+
             environment.define(name: name.lexeme, value: .null)
+            
+            let superclass: Class?
+            if let superclassExpr = superclassExpr {
+                let value = try superclassExpr.evaluate(environment: environment)
+                
+                guard case let .callable(collable) = value,
+                    let klass = collable as? Class else {
+                    throw RuntimeError(name, "Superclass must be a class.")
+                }
+                
+                superclass = klass
+                
+                environment = Environment(enclosing: environment)
+                environment.define(name: "super", value: value)
+            } else {
+                superclass = nil
+            }
             
             var methods: [String: Function] = [:]
             for methodExpr in methodExprs {
@@ -183,7 +218,11 @@ extension ResolvedStmt {
                 methods[name.lexeme] = Function(name: name, parameters: parameters, body: body, closure: environment, isInitializer: name.lexeme == "init")
             }
             
-            let klass = Class(name: name.lexeme, methods: methods)
+            let klass = Class(name: name.lexeme, superclass: superclass, methods: methods)
+            
+            if superclass != nil {
+                environment = environment.enclosing!
+            }
             
             environment.define(name: name.lexeme, value: .callable(klass))
         case .if(let condExpr, let thenBranch, let elseBranch):

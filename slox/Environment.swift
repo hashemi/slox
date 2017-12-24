@@ -37,6 +37,24 @@ class Environment {
         return values["this"]!
     }
     
+    func getThis(at depth: Int) -> LiteralValue {
+        var environment: Environment? = self
+        for _ in 0..<depth {
+            environment = environment?.enclosing
+        }
+        
+        return environment!.values["this"]!
+    }
+    
+    func getSuper(at depth: Int) throws -> LiteralValue {
+        var environment: Environment? = self
+        for _ in 0..<depth {
+            environment = environment?.enclosing
+        }
+        
+        return environment!.values["super"]!
+    }
+    
     func assign(name: Token, value: LiteralValue, at depth: Int) throws {
         var environment: Environment? = self
         for _ in 0..<depth {

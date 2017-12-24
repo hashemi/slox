@@ -17,6 +17,7 @@ class Resolver {
     enum ClassType {
         case none
         case `class`
+        case subclass
     }
     
     private var scopes: [[String: Bool]] = []
@@ -49,6 +50,11 @@ class Resolver {
     func defineThis() {
         if scopes.isEmpty { return }
         scopes[scopes.count - 1]["this"] = true
+    }
+    
+    func defineSuper() {
+        if scopes.isEmpty { return }
+        scopes[scopes.count - 1]["super"] = true
     }
     
     func declaredNotDefined(_ name: Token) -> Bool {
@@ -96,11 +102,21 @@ extension Stmt {
             resolver.end()
             return .block(statements: resolvedStatements)
         
-        case .class(let name, let methods):
+        case .class(let name, let superclass, let methods):
             resolver.declare(name)
             resolver.define(name)
             let enclosingClass = resolver.currentClass
             resolver.currentClass = .class
+            
+            let resolvedSuperclass: ResolvedExpr?
+            if let superclass = superclass {
+                resolver.currentClass = .subclass
+                resolvedSuperclass = superclass.resolve(resolver: resolver)
+                resolver.begin()
+                resolver.defineSuper()
+            } else {
+                resolvedSuperclass = nil
+            }
             
             resolver.begin()
             resolver.defineThis()
@@ -118,9 +134,13 @@ extension Stmt {
             
             resolver.end()
             
+            if resolvedSuperclass != nil {
+                resolver.end()
+            }
+            
             resolver.currentClass = enclosingClass
             
-            return .class(name: name, methods: resolvedMethods)
+            return .class(name: name, superclass: resolvedSuperclass, methods: resolvedMethods)
             
         case .variable(let name, let initializer):
             resolver.declare(name)
@@ -220,6 +240,16 @@ extension Expr{
                 object: object.resolve(resolver: resolver),
                 name: name,
                 value: value.resolve(resolver: resolver))
+        
+        case .super(let keyword, let method):
+            switch resolver.currentClass {
+            case .none: Lox.error(keyword, "Cannot use 'super' outside of a class.")
+            case .class: Lox.error(keyword, "Cannot use 'super' in a class with no superclass.")
+            case .subclass: break
+            }
+            
+            let depth = resolver.resolveLocal(keyword)
+            return .super(keyword: keyword, method: method, depth: depth)
         
         case .this(let keyword):
             if resolver.currentClass == .none {

@@ -67,6 +67,15 @@ class Parser {
     
     private func classDeclaration() throws -> Stmt {
         let name = try consume(.IDENTIFIER, "Expect class name.")
+        
+        let superclass: Expr?
+        if match(.LESS) {
+            try consume(.IDENTIFIER, "Expect superclass name.")
+            superclass = Expr.variable(name: previous)
+        } else {
+            superclass = nil
+        }
+        
         try consume(.LEFT_BRACE, "Expect '{' before class body.")
         
         var methods: [Stmt] = []
@@ -76,7 +85,7 @@ class Parser {
         
         try consume(.RIGHT_BRACE, "Expect '}' after class body.")
         
-        return .class(name: name, methods: methods)
+        return .class(name: name, superclass: superclass, methods: methods)
     }
     
     private func statement() throws -> Stmt {
@@ -365,6 +374,13 @@ class Parser {
         if match(.NIL) { return .literal(value: .null) }
         
         if match([.NUMBER, .STRING]) { return .literal(value: previous.literal) }
+        
+        if match(.SUPER) {
+            let keyword = previous
+            try consume(.DOT, "Expect '.' after 'super'.")
+            let method = try consume(.IDENTIFIER, "Expect superclass method name.")
+            return .super(keyword: keyword, method: method)
+        }
         
         if match(.THIS) { return .this(keyword: previous) }
         

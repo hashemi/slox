@@ -7,11 +7,33 @@
 //
 
 struct Class {
+    class Superclass {
+        let superclass: Class?
+        init(_ superclass: Class?) {
+            self.superclass = superclass
+        }
+    }
+    
     let name: String
+    let superclass: Superclass
     let methods: [String: Function]
     
+    init(name: String, superclass: Class?, methods: [String: Function]) {
+        self.name = name
+        self.superclass = Superclass(superclass)
+        self.methods = methods
+    }
+    
     func find(instance: Instance, method: String) -> Function? {
-        return methods[method]?.bind(instance)
+        if let boundMethod = methods[method]?.bind(instance) {
+            return boundMethod
+        }
+        
+        if let superclass = superclass.superclass {
+            return superclass.find(instance: instance, method: method)
+        }
+        
+        return nil
     }
 }
 

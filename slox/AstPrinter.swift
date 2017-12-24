@@ -39,6 +39,8 @@ extension Expr {
             return parenthesize("= \(getter)", [value])
         case .this(let keyword):
             return keyword.lexeme
+        case .super(let keyword, let method):
+            return "\(keyword.lexeme).\(method.lexeme)"
         }
     }
 }
