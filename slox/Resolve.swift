@@ -10,6 +10,7 @@ class Resolver {
     enum FunctionType {
         case none
         case function
+        case initializer
         case method
     }
     
@@ -110,7 +111,9 @@ extension Stmt {
                     fatalError("Class declaration can only contain methods.")
                 }
                 
-                return resolver.resolveFunction(name: name, parameters: parameters, body: body, type: .method)
+                let declaration: Resolver.FunctionType = name.lexeme == "init" ? .initializer : .method
+                
+                return resolver.resolveFunction(name: name, parameters: parameters, body: body, type: declaration)
             }
             
             resolver.end()
@@ -146,6 +149,14 @@ extension Stmt {
         case .return(let keyword, let value):
             if resolver.currentFunction == .none {
                 Lox.error(keyword, "Cannot return from top-level code.")
+            }
+            
+            if resolver.currentFunction == .initializer {
+                switch value {
+                case .literal(value: .null): break // Return not followed by a value is permitted in initializers
+                default:
+                    Lox.error(keyword, "Cannot return a value from an initializer.")
+                }
             }
             
             return .return(keyword: keyword, value: value.resolve(resolver: resolver))
