@@ -6,11 +6,12 @@ This project follows Bob Nystrom's excellent book,
 [Crafting Interpreters](http://www.craftinginterpreters.com)
 which takes you through the process of writing an interpreter for a language
 called Lox. The book is being released as chapters are completed, one chapter
-at a time.
+at a time. At this time, the Java interpreter part of the book is complete.
+The next part of the book will implement a Lox compiler in C.
 
 ## Progress
-As of 14 Sep 2017, this code is up to date with the book. The following chapters
-are implemented:
+As of 24 Dec 2017, the only missing part is Inheritance (Chapter 13). The
+following chapters are implemented in this Swift version:
 
 4. Scanning
 5. Representing Code
@@ -20,16 +21,18 @@ are implemented:
 9. Control Flow
 10. Functions
 11. Resolving and Binding
+12. Classes
 
 ## Tests
-As of 14 Sep 2017, the test suite is up to date with the reference Java
-implementation and all chapter 11 tests pass successfully.
+As of 24 Dec 2017, the test suite is up to date with the reference Java
+implementation. The majority of chapter 12 tests pass successfully. The two
+exceptions are class equality and method equality.
 
 To run the tests:
 
 ```shell
 $ swift build
-$ ./test_swift.py chap11_resolving
+$ ./test_swift.py chap12_classes
 ```
 
 ## Goals & Design
