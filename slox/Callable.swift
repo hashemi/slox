@@ -17,6 +17,7 @@ struct Function: Callable {
     let body: [ResolvedStmt]
 
     let closure: Environment
+    let isInitializer: Bool
 
     var arity: Int { return parameters.count }
     
@@ -35,13 +36,17 @@ struct Function: Callable {
             return ret.value
         }
         
+        if isInitializer {
+            return try closure.getThis()
+        }
+        
         return .null
     }
     
     func bind(_ instance: Instance) -> Function {
         let environment = Environment(enclosing: closure)
         environment.define(name: "this", value: .instance(instance))
-        return Function(name: name, parameters: parameters, body: body, closure: environment)
+        return Function(name: name, parameters: parameters, body: body, closure: environment, isInitializer: isInitializer)
     }
 }
 

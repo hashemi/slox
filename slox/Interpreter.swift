@@ -180,7 +180,7 @@ extension ResolvedStmt {
                     fatalError("Class declaration should only contain methods.")
                 }
                 
-                methods[name.lexeme] = Function(name: name, parameters: parameters, body: body, closure: environment)
+                methods[name.lexeme] = Function(name: name, parameters: parameters, body: body, closure: environment, isInitializer: name.lexeme == "init")
             }
             
             let klass = Class(name: name.lexeme, methods: methods)
@@ -194,7 +194,7 @@ extension ResolvedStmt {
                 try elseBranch?.execute(environment: environment)
             }
         case .function(let name, let parameters, let body):
-            let callable = Function(name: name, parameters: parameters, body: body, closure: environment)
+            let callable = Function(name: name, parameters: parameters, body: body, closure: environment, isInitializer: false)
             environment.define(name: name.lexeme, value: .callable(callable))
         case .return(_, let valueExpr):
             let value = try valueExpr.evaluate(environment: environment)

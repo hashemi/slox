@@ -22,9 +22,15 @@ extension Class: CustomStringConvertible {
 }
 
 extension Class: Callable {
-    var arity: Int { return 0 }
+    var arity: Int { return methods["init"]?.arity ?? 0 }
     func call(_ args: [LiteralValue]) throws -> LiteralValue {
-        return .instance(Instance(class: self))
+        let instance = Instance(class: self)
+        
+        if let initializer = methods["init"] {
+            _ = try initializer.bind(instance).call(args)
+        }
+        
+        return .instance(instance)
     }
 }
 

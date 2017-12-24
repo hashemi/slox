@@ -33,6 +33,10 @@ class Environment {
         return value
     }
     
+    func getThis() throws -> LiteralValue {
+        return values["this"]!
+    }
+    
     func assign(name: Token, value: LiteralValue, at depth: Int) throws {
         var environment: Environment? = self
         for _ in 0..<depth {
