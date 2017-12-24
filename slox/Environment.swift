@@ -51,13 +51,14 @@ extension Environment {
     static let globals: Environment = {
         var environment = Environment()
         
-        environment.define(name: "clock", value: .callable(Callable(
+        environment.define(
             name: "clock",
-            arity: 0,
-            call: { (env: Environment, args: [LiteralValue]) -> LiteralValue in
-                return .number(Double(CFAbsoluteTimeGetCurrent()) + 978307200.0)
-            }
-        )))
+            value: .callable(
+                NativeFunction(arity: 0) { _ in
+                    return .number(Double(CFAbsoluteTimeGetCurrent()) + 978307200.0)
+                }
+            )
+        )
         
         return environment
     }()

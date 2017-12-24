@@ -112,7 +112,7 @@ extension ResolvedExpr {
                    "Expected \(callable.arity) arguments but got \(arguments.count).")
             }
             
-            return try callable.call(environment, arguments)
+            return try callable.call(arguments)
         
         case .get(let objectExpr, let name):
             let object = try objectExpr.evaluate(environment: environment)
@@ -149,29 +149,6 @@ extension ResolvedExpr {
     }
 }
 
-extension Callable {
-    init(name: Token, parameters: [Token], body: [ResolvedStmt], environment: Environment) {
-        self.init(
-            name: name.lexeme,
-            arity: parameters.count,
-            call: { (env: Environment, args: [LiteralValue]) -> LiteralValue in
-                let environment = Environment(enclosing: environment)
-                for (par, arg) in zip(parameters, args) {
-                    environment.define(name: par.lexeme, value: arg)
-                }
-                do {
-                    for statement in body {
-                        try statement.execute(environment: environment)
-                    }
-                } catch let ret as Return {
-                    return ret.value
-                }
-                return .null
-            }
-        )
-    }
-}
-
 extension ResolvedStmt {
     func execute(environment: Environment) throws {
         switch self {
@@ -203,21 +180,12 @@ extension ResolvedStmt {
                     fatalError("Class declaration should only contain methods.")
                 }
                 
-                methods[name.lexeme] = Callable(name: name, parameters: parameters, body: body, environment: environment)
+                methods[name.lexeme] = Function(name: name, parameters: parameters, body: body, closure: environment)
             }
             
             let klass = Class(name: name.lexeme, methods: methods)
             
-            let callable = Callable(
-                name: name.lexeme,
-                arity: 0,
-                call: { (env: Environment, args: [LiteralValue]) -> LiteralValue in
-                    let instance = Instance(class: klass)
-                    return .instance(instance)
-                }
-            )
-            
-            environment.define(name: name.lexeme, value: .callable(callable))
+            environment.define(name: name.lexeme, value: .callable(klass))
         case .if(let condExpr, let thenBranch, let elseBranch):
             let condition = try condExpr.evaluate(environment: environment).isTrue
             if condition {
@@ -226,7 +194,7 @@ extension ResolvedStmt {
                 try elseBranch?.execute(environment: environment)
             }
         case .function(let name, let parameters, let body):
-            let callable = Callable(name: name, parameters: parameters, body: body, environment: environment)
+            let callable = Function(name: name, parameters: parameters, body: body, closure: environment)
             environment.define(name: name.lexeme, value: .callable(callable))
         case .return(_, let valueExpr):
             let value = try valueExpr.evaluate(environment: environment)

@@ -21,6 +21,13 @@ extension Class: CustomStringConvertible {
     }
 }
 
+extension Class: Callable {
+    var arity: Int { return 0 }
+    func call(_ args: [LiteralValue]) throws -> LiteralValue {
+        return .instance(Instance(class: self))
+    }
+}
+
 class Instance {
     let klass: Class
     var fields: [String: LiteralValue] = [:]
