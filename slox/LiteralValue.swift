@@ -12,6 +12,7 @@ enum LiteralValue {
     case string(String)
     case null
     case callable(Callable)
+    case instance(Instance)
 }
 
 extension LiteralValue {
@@ -19,7 +20,7 @@ extension LiteralValue {
         switch self {
         case .null: return false
         case let .bool(val): return val
-        case .number, .string, .callable: return true
+        case .number, .string, .callable, .instance: return true
         }
     }
 }
@@ -35,7 +36,7 @@ extension LiteralValue: Equatable {
             return left == right
         case let (.bool(left), .bool(right)):
             return left == right
-        case (.null, _), (.bool, _), (.string, _), (.number, _), (.callable, _):
+        case (.null, _), (.bool, _), (.string, _), (.number, _), (.callable, _), (.instance, _):
             return false
         }
     }
@@ -55,6 +56,8 @@ extension LiteralValue: CustomStringConvertible {
             return String(bool)
         case let .callable(callable):
             return callable.description
+        case let .instance(instance):
+            return instance.description
         }
     }
 }

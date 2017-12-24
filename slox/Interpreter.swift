@@ -146,6 +146,20 @@ extension ResolvedStmt {
             for statement in statements {
                 try statement.execute(environment: blockEnvironment)
             }
+        case .class(let name, let methods):
+            environment.define(name: name.lexeme, value: .null)
+            let klass = Class(name: name.lexeme)
+            
+            let callable = Callable(
+                name: name.lexeme,
+                arity: 0,
+                call: { (env: Environment, args: [LiteralValue]) -> LiteralValue in
+                    let instance = Instance(class: klass)
+                    return .instance(instance)
+                }
+            )
+            
+            environment.define(name: name.lexeme, value: .callable(callable))
         case .if(let condExpr, let thenBranch, let elseBranch):
             let condition = try condExpr.evaluate(environment: environment).isTrue
             if condition {

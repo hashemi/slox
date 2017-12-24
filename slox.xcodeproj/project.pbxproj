@@ -22,6 +22,7 @@
 		EE8023651EE281CC00A499A2 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE8023641EE281CC00A499A2 /* Environment.swift */; };
 		EE89BCBC1EE09737004A7C62 /* Stmt.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE89BCBB1EE09737004A7C62 /* Stmt.swift */; };
 		EE9A58CA1F2F802A00E97907 /* Callable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE9A58C91F2F802A00E97907 /* Callable.swift */; };
+		EEE454731FEF7060005FA160 /* Class.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE454721FEF7060005FA160 /* Class.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -53,6 +54,7 @@
 		EE8023641EE281CC00A499A2 /* Environment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		EE89BCBB1EE09737004A7C62 /* Stmt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stmt.swift; sourceTree = "<group>"; };
 		EE9A58C91F2F802A00E97907 /* Callable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Callable.swift; sourceTree = "<group>"; };
+		EEE454721FEF7060005FA160 /* Class.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Class.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,6 +102,7 @@
 				EE9A58C91F2F802A00E97907 /* Callable.swift */,
 				EE5DDCC61F2FCCF000910FCA /* Return.swift */,
 				EE20AE891F66D823001F601F /* Resolve.swift */,
+				EEE454721FEF7060005FA160 /* Class.swift */,
 			);
 			path = slox;
 			sourceTree = "<group>";
@@ -176,6 +179,7 @@
 				EE20AE8A1F66D823001F601F /* Resolve.swift in Sources */,
 				EE2C42BE1E7DE3AE005EAE69 /* Expr.swift in Sources */,
 				EE2C42C41E82C91E005EAE69 /* LiteralValue.swift in Sources */,
+				EEE454731FEF7060005FA160 /* Class.swift in Sources */,
 				EE5DDCC71F2FCCF000910FCA /* Return.swift in Sources */,
 				EE9A58CA1F2F802A00E97907 /* Callable.swift in Sources */,
 				EE2C42B81E7D5D8B005EAE69 /* Token.swift in Sources */,

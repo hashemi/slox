@@ -83,6 +83,12 @@ extension Stmt {
             resolver.end()
             return .block(statements: resolvedStatements)
         
+        case .class(let name, let methods):
+            resolver.declare(name)
+            resolver.define(name)
+            let resolvedMethods = methods.map { $0.resolve(resolver: resolver) }
+            return .class(name: name, methods: resolvedMethods)
+            
         case .variable(let name, let initializer):
             resolver.declare(name)
             let resolvedInitializer = initializer.resolve(resolver: resolver)
