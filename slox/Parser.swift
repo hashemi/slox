@@ -40,10 +40,226 @@ class Parser {
         return statements
     }
     
+    private func match(_ type: TokenType) -> Bool {
+        if check(type) {
+            advance()
+            return true
+        }
+        
+        return false
+    }
+    
+    private func match(_ type1: TokenType, _ type2: TokenType) -> Bool {
+        return match(type1) || match(type2)
+    }
+    
+    private func match(_ t1: TokenType, _ t2: TokenType, _ t3: TokenType, _ t4: TokenType) -> Bool {
+        return match(t1) || match(t2) || match(t3) || match(t4)
+    }
+    
+    @discardableResult private func consume(_ type: TokenType, _ message: String) throws -> Token {
+        if check(type) { return advance() }
+        
+        throw error(peek, message)
+    }
+
+    private func check(_ tokenType: TokenType) -> Bool {
+        if isAtEnd { return false }
+        return peek.type == tokenType
+    }
+    
+    @discardableResult private func advance() -> Token {
+        if !isAtEnd { current += 1 }
+        return previous
+    }
+    
+    private func error(_ token: Token, _ message: String) -> Error {
+        Lox.error(token, message)
+        return ParseError()
+    }
+    
+    private func synchronize() {
+        advance()
+        while !isAtEnd {
+            if previous.type == .semicolon { return }
+            
+            switch peek.type {
+            case .class, .fun, .var, .for, .if, .while, .print, .return: return
+            default: advance()
+            }
+        }
+    }
+
+    // Expressions
     private func expression() throws -> Expr {
         return try assignment()
     }
     
+    private func assignment() throws -> Expr {
+        let expr = try or()
+        
+        if match(.equal) {
+            let equals = previous
+            let value = try assignment()
+            
+            if case let .variable(name) = expr {
+                return .assign(name: name, value: value)
+            }
+            
+            if case let .get(object, name) = expr {
+                return .set(object: object, name: name, value: value)
+            }
+            
+            throw error(equals, "Invalid assignment target.")
+        }
+        
+        return expr
+    }
+    
+    private func or() throws -> Expr {
+        var expr = try and()
+        
+        while match(.or) {
+            let op = previous
+            let right = try and()
+            expr = .logical(left: expr, op: op, right: right)
+        }
+        
+        return expr
+    }
+    
+    private func and() throws -> Expr {
+        var expr = try equality()
+        
+        while match(.and) {
+            let op = previous
+            let right = try equality()
+            expr = .logical(left: expr, op: op, right: right)
+        }
+        
+        return expr
+    }
+    
+    private func equality() throws -> Expr {
+        var expr = try comparison()
+        
+        while match(.bangEqual, .equalEqual) {
+            let op = previous
+            let right = try comparison()
+            expr = .binary(left: expr, op: op, right: right)
+        }
+        
+        return expr
+    }
+    
+    private func comparison() throws -> Expr {
+        var expr = try term()
+        
+        while match(.greater, .greaterEqual, .less, .lessEqual) {
+            let op = previous
+            let right = try term()
+            expr = .binary(left: expr, op: op, right: right)
+        }
+        
+        return expr
+    }
+    
+    private func term() throws -> Expr {
+        var expr = try factor()
+        
+        while match(.minus, .plus) {
+            let op = previous
+            let right = try factor()
+            expr = .binary(left: expr, op: op, right: right)
+        }
+        
+        return expr
+    }
+    
+    private func factor() throws -> Expr {
+        var expr = try unary()
+        
+        while match(.slash, .star) {
+            let op = previous
+            let right = try unary()
+            expr = .binary(left: expr, op: op, right: right)
+        }
+        
+        return expr
+    }
+    
+    private func unary() throws -> Expr {
+        if match(.bang, .minus) {
+            let op = previous
+            let right = try unary()
+            return .unary(op: op, right: right)
+        }
+        
+        return try call()
+    }
+    
+    private func call() throws -> Expr {
+        var expr = try primary()
+        
+        while true {
+            if match(.leftParen) {
+                expr = try finishCall(expr)
+            } else if match(.dot) {
+                let name = try consume(.identifier, "Expect property name after '.'.")
+                expr = .get(object: expr, name: name)
+            } else {
+                break
+            }
+        }
+        
+        return expr
+    }
+    
+    private func finishCall(_ callee: Expr) throws -> Expr {
+        var arguments: [Expr] = []
+        
+        if !check(.rightParen) {
+            repeat {
+                if arguments.count == 8 {
+                    _ = error(peek, "Cannot have more than 8 arguments.")
+                }
+                arguments.append(try expression())
+            } while match(.comma)
+        }
+        
+        let paren = try consume(.rightParen, "Expect ')' after arguments.")
+        
+        return .call(callee: callee, paren: paren, arguments: arguments)
+    }
+    
+    private func primary() throws -> Expr {
+        if match(.false) { return .literal(value: .bool(false)) }
+        if match(.true) { return .literal(value: .bool(true)) }
+        if match(.nil) { return .literal(value: .null) }
+        
+        if match(.number, .string) { return .literal(value: previous.literal) }
+        
+        if match(.super) {
+            let keyword = previous
+            try consume(.dot, "Expect '.' after 'super'.")
+            let method = try consume(.identifier, "Expect superclass method name.")
+            return .super(keyword: keyword, method: method)
+        }
+        
+        if match(.this) { return .this(keyword: previous) }
+        
+        if match(.identifier) { return .variable(name: previous) }
+        
+        if match(.leftParen) {
+            let expr = try expression()
+            try consume(.rightParen, "Expect ')' after expression.")
+            return .grouping(expr: expr)
+        }
+        
+        throw error(peek, "Expect expression.")
+    }
+
+    // Statements
     private func declaration() throws -> Stmt? {
         do {
             if match(.class) {
@@ -173,7 +389,7 @@ class Parser {
         try consume(.semicolon, "Expect ';' after return value.")
         return .return(keyword: keyword, value: value)
     }
-
+    
     private func varDeclaration() throws -> Stmt {
         let name = try consume(.identifier, "Expect variable name.")
         let initializer = match(.equal) ? try expression() : .literal(value: .null)
@@ -229,216 +445,5 @@ class Parser {
         try consume(.rightBrace, "Expect '}' after block.")
         return statements
     }
-    
-    private func assignment() throws -> Expr {
-        let expr = try or()
-        
-        if match(.equal) {
-            let equals = previous
-            let value = try assignment()
-            
-            if case let .variable(name) = expr {
-                return .assign(name: name, value: value)
-            }
-            
-            if case let .get(object, name) = expr {
-                return .set(object: object, name: name, value: value)
-            }
-            
-            throw error(equals, "Invalid assignment target.")
-        }
-        
-        return expr
-    }
-    
-    private func or() throws -> Expr {
-        var expr = try and()
-        
-        while match(.or) {
-            let op = previous
-            let right = try and()
-            expr = .logical(left: expr, op: op, right: right)
-        }
-        
-        return expr
-    }
-    
-    private func and() throws -> Expr {
-        var expr = try equality()
-        
-        while match(.and) {
-            let op = previous
-            let right = try equality()
-            expr = .logical(left: expr, op: op, right: right)
-        }
-        
-        return expr
-    }
-    
-    private func equality() throws -> Expr {
-        var expr = try comparison()
-        
-        while match([.bangEqual, .equalEqual]) {
-            let op = previous
-            let right = try comparison()
-            expr = .binary(left: expr, op: op, right: right)
-        }
-        
-        return expr
-    }
-    
-    private func comparison() throws -> Expr {
-        var expr = try term()
-        
-        while match([.greater, .greaterEqual, .less, .lessEqual]) {
-            let op = previous
-            let right = try term()
-            expr = .binary(left: expr, op: op, right: right)
-        }
-        
-        return expr
-    }
-    
-    private func term() throws -> Expr {
-        var expr = try factor()
-        
-        while match([.minus, .plus]) {
-            let op = previous
-            let right = try factor()
-            expr = .binary(left: expr, op: op, right: right)
-        }
-        
-        return expr
-    }
-    
-    private func factor() throws -> Expr {
-        var expr = try unary()
-        
-        while match([.slash, .star]) {
-            let op = previous
-            let right = try unary()
-            expr = .binary(left: expr, op: op, right: right)
-        }
-        
-        return expr
-    }
-    
-    private func unary() throws -> Expr {
-        if match([.bang, .minus]) {
-            let op = previous
-            let right = try unary()
-            return .unary(op: op, right: right)
-        }
-        
-        return try call()
-    }
-    
-    private func call() throws -> Expr {
-        var expr = try primary()
-        
-        while true {
-            if match([.leftParen]) {
-                expr = try finishCall(expr)
-            } else if match([.dot]) {
-                let name = try consume(.identifier, "Expect property name after '.'.")
-                expr = .get(object: expr, name: name)
-            } else {
-                break
-            }
-        }
-        
-        return expr
-    }
-    
-    private func finishCall(_ callee: Expr) throws -> Expr {
-        var arguments: [Expr] = []
-        
-        if !check(.rightParen) {
-            repeat {
-                if arguments.count == 8 {
-                    _ = error(peek, "Cannot have more than 8 arguments.")
-                }
-                arguments.append(try expression())
-            } while match(.comma)
-        }
-        
-        let paren = try consume(.rightParen, "Expect ')' after arguments.")
-        
-        return .call(callee: callee, paren: paren, arguments: arguments)
-    }
-    
-    private func primary() throws -> Expr {
-        if match(.false) { return .literal(value: .bool(false)) }
-        if match(.true) { return .literal(value: .bool(true)) }
-        if match(.nil) { return .literal(value: .null) }
-        
-        if match([.number, .string]) { return .literal(value: previous.literal) }
-        
-        if match(.super) {
-            let keyword = previous
-            try consume(.dot, "Expect '.' after 'super'.")
-            let method = try consume(.identifier, "Expect superclass method name.")
-            return .super(keyword: keyword, method: method)
-        }
-        
-        if match(.this) { return .this(keyword: previous) }
-        
-        if match(.identifier) { return .variable(name: previous) }
-        
-        if match(.leftParen) {
-            let expr = try expression()
-            try consume(.rightParen, "Expect ')' after expression.")
-            return .grouping(expr: expr)
-        }
-        
-        throw error(peek, "Expect expression.")
-    }
-    
-    private func match(_ types: [TokenType]) -> Bool {
-        for type in types {
-            if check(type) {
-                advance()
-                return true
-            }
-        }
-        
-        return false
-    }
-    
-    private func match(_ type: TokenType) -> Bool {
-        return match([type])
-    }
-    
-    @discardableResult private func consume(_ type: TokenType, _ message: String) throws -> Token {
-        if check(type) { return advance() }
-        
-        throw error(peek, message)
-    }
-
-    private func check(_ tokenType: TokenType) -> Bool {
-        if isAtEnd { return false }
-        return peek.type == tokenType
-    }
-    
-    @discardableResult private func advance() -> Token {
-        if !isAtEnd { current += 1 }
-        return previous
-    }
-    
-    private func error(_ token: Token, _ message: String) -> Error {
-        Lox.error(token, message)
-        return ParseError()
-    }
-    
-    private func synchronize() {
-        advance()
-        while !isAtEnd {
-            if previous.type == .semicolon { return }
-            
-            switch peek.type {
-            case .class, .fun, .var, .for, .if, .while, .print, .return: return
-            default: advance()
-            }
-        }
-    }
 }
+
