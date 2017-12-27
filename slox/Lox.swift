@@ -24,7 +24,7 @@ struct Lox {
     
     static func runFile(_ path: String) throws {
         let bytes = try Data(contentsOf: URL(fileURLWithPath: path))
-        run(String(bytes: bytes, encoding: .utf8)!, environment: Environment())
+        run(String(bytes: bytes, encoding: .utf8)!, environment: .globals)
         
         if hadError { exit(65) }
         if hadRuntimeError { exit(70) }

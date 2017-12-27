@@ -12,8 +12,12 @@ class Environment {
     var values: [String: LiteralValue] = [:]
     let enclosing: Environment?
     
-    init(enclosing: Environment? = nil) {
+    init(enclosing: Environment) {
         self.enclosing = enclosing
+    }
+    
+    fileprivate init() {
+        self.enclosing = nil
     }
     
     func define(name: String, value: LiteralValue) {
