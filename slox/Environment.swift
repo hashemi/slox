@@ -16,7 +16,7 @@ class Environment {
         self.enclosing = enclosing
     }
     
-    fileprivate init() {
+    private init() {
         self.enclosing = nil
     }
     
