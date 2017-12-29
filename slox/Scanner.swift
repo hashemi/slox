@@ -78,9 +78,9 @@ class Scanner {
         return source.unicodeScalars[next]
     }
     
-    private func match(_ expected: Character) -> Bool {
+    private func match(_ expected: UnicodeScalar) -> Bool {
         if isAtEnd { return false }
-        if source[current] != expected { return false }
+        if source.unicodeScalars[current] != expected { return false }
         
         current = source.index(after: current)
         return true
