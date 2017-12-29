@@ -169,7 +169,11 @@ extension ResolvedExpr {
         
         case .assign(let name, let value, let depth):
             let value = try value.evaluate(environment: environment)
-            try environment.assign(name: name, value: value, at: depth)
+            
+            guard environment.assign(name: name.lexeme, value: value, at: depth) else {
+                throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
+            }
+            
             return value
         }
     }

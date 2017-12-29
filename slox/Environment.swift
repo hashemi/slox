@@ -32,17 +32,15 @@ class Environment {
         }
     }
     
-    func assign(name: Token, value: LiteralValue, at depth: Int) throws {
-        var environment: Environment? = self
-        for _ in 0..<depth {
-            environment = environment?.enclosing
+    func assign(name: String, value: LiteralValue, at depth: Int) -> Bool {
+        if depth == 0 {
+            guard values[name] != nil else { return false }
+            
+            values[name] = value
+            return true
+        } else {
+            return enclosing!.assign(name: name, value: value, at: depth - 1)
         }
-        
-        guard environment?.values[name.lexeme] != nil else {
-            throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
-        }
-        
-        environment?.values[name.lexeme] = value
     }
 }
 
