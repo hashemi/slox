@@ -238,8 +238,14 @@ extension Parser {
         if match(.false) { return .literal(value: .bool(false)) }
         if match(.true) { return .literal(value: .bool(true)) }
         if match(.nil) { return .literal(value: .null) }
+        if match(.number) { return .literal(value: .number(Double(previous.lexeme)!)) }
         
-        if match(.number, .string) { return .literal(value: previous.literal) }
+        if match(.string) {
+            // remove quotes
+            let lexeme = previous.lexeme
+            let range = lexeme.index(after: lexeme.startIndex)..<lexeme.index(before: lexeme.endIndex)
+            return .literal(value: .string(String(lexeme[range])))
+        }
         
         if match(.super) {
             let keyword = previous

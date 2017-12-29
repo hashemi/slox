@@ -100,8 +100,8 @@ class Scanner {
 }
 
 extension Scanner {
-    private func addToken(_ type: TokenType, _ literal: LiteralValue = .null) {
-        tokens.append(Token(type, currentText, literal, line))
+    private func addToken(_ type: TokenType) {
+        tokens.append(Token(type, currentText, line))
     }
     
     func scanTokens() -> [Token] {
@@ -110,7 +110,7 @@ extension Scanner {
             scanToken()
         }
         
-        tokens.append(Token(.eof, "", .null, line))
+        tokens.append(Token(.eof, "", line))
         return tokens
     }
     
@@ -173,7 +173,7 @@ extension Scanner {
             while peek.isDigit { advance() }
         }
         
-        addToken(.number, .number(Double(currentText)!))
+        addToken(.number)
     }
     
     private func string() {
@@ -191,8 +191,6 @@ extension Scanner {
         // The closing ".
         advance()
         
-        let range = source.index(after: start)..<source.index(before: current)
-        let value = source[range]
-        addToken(.string, .string(String(value)))
+        addToken(.string)
     }
 }
