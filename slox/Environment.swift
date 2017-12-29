@@ -9,38 +9,44 @@
 import CoreFoundation
 
 class Environment {
-    var values: [String: LiteralValue] = [:]
-    let enclosing: Environment?
+    // Wrapper class to get reference semantics
+    private class Scope {
+        private var values: [String: LiteralValue] = [:]
+        subscript(index: String) -> LiteralValue? {
+            get {
+                return values[index]
+            }
+            set(newValue) {
+                values[index] = newValue
+            }
+        }
+    }
+    
+    private var stack: [Scope]
     
     init(enclosing: Environment) {
-        self.enclosing = enclosing
+        var newStack = enclosing.stack
+        newStack.append(Scope())
+        self.stack = newStack
     }
     
     private init() {
-        self.enclosing = nil
+        self.stack = [Scope()]
     }
     
     func define(name: String, value: LiteralValue) {
-        values[name] = value
+        stack[stack.count - 1][name] = value
     }
     
     func get(name: String, at depth: Int) -> LiteralValue? {
-        if depth == 0 {
-            return values[name]
-        } else {
-            return enclosing!.get(name: name, at: depth - 1)
-        }
+        return stack[stack.count - 1 - depth][name]
     }
     
     func assign(name: String, value: LiteralValue, at depth: Int) -> Bool {
-        if depth == 0 {
-            guard values[name] != nil else { return false }
-            
-            values[name] = value
-            return true
-        } else {
-            return enclosing!.assign(name: name, value: value, at: depth - 1)
-        }
+        guard stack[stack.count - 1 - depth][name] != nil else { return false }
+        
+        stack[stack.count - 1 - depth][name] = value
+        return true
     }
 }
 

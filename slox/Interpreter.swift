@@ -205,6 +205,8 @@ extension ResolvedStmt {
             }
 
         case .class(let name, let superclassExpr, let methodExprs):
+            let originalEnvironment = environment
+            
             var environment = environment
 
             environment.define(name: name.lexeme, value: .null)
@@ -241,7 +243,7 @@ extension ResolvedStmt {
             let klass = Class(name: name.lexeme, superclass: superclass, methods: methods)
             
             if superclass != nil {
-                environment = environment.enclosing!
+                environment = originalEnvironment
             }
             
             environment.define(name: name.lexeme, value: .class(klass))
