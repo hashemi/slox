@@ -6,7 +6,7 @@
 //  Copyright © 2017 Ahmad Alhashemi. All rights reserved.
 //
 
-extension TokenType {
+private extension TokenType {
     init?(keyword: String) {
         let keywords: [String: TokenType] = [
             "and": .and,
@@ -78,10 +78,30 @@ class Scanner {
         return source.unicodeScalars[next]
     }
     
+    private func match(_ expected: Character) -> Bool {
+        if isAtEnd { return false }
+        if source[current] != expected { return false }
+        
+        current = source.index(after: current)
+        return true
+    }
+    
+    @discardableResult private func advance() -> UnicodeScalar {
+        let result = source.unicodeScalars[current]
+        current = source.unicodeScalars.index(after: current)
+        return result
+    }
+    
     init(_ source: String) {
         self.source = source
         self.start = source.unicodeScalars.startIndex
         self.current = source.unicodeScalars.startIndex
+    }
+}
+
+extension Scanner {
+    private func addToken(_ type: TokenType, _ literal: LiteralValue = .null) {
+        tokens.append(Token(type, currentText, literal, line))
     }
     
     func scanTokens() -> [Token] {
@@ -174,23 +194,5 @@ class Scanner {
         let range = source.index(after: start)..<source.index(before: current)
         let value = source[range]
         addToken(.string, .string(String(value)))
-    }
-    
-    private func match(_ expected: Character) -> Bool {
-        if isAtEnd { return false }
-        if source[current] != expected { return false }
-        
-        current = source.index(after: current)
-        return true
-    }
-    
-    @discardableResult private func advance() -> UnicodeScalar {
-        let result = source.unicodeScalars[current]
-        current = source.unicodeScalars.index(after: current)
-        return result
-    }
-    
-    private func addToken(_ type: TokenType, _ literal: LiteralValue = .null) {
-        tokens.append(Token(type, currentText, literal, line))
     }
 }
