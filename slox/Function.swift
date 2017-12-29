@@ -34,7 +34,7 @@ struct UserFunction: Function {
         }
         
         if isInitializer {
-            return try closure.getThis()
+            return closure.get(name: "this", at: 0)!
         }
         
         return .null

@@ -24,39 +24,12 @@ class Environment {
         values[name] = value
     }
     
-    func get(name: Token, at depth: Int) throws -> LiteralValue {
-        var environment: Environment? = self
-        for _ in 0..<depth {
-            environment = environment?.enclosing
+    func get(name: String, at depth: Int) -> LiteralValue? {
+        if depth == 0 {
+            return values[name]
+        } else {
+            return enclosing!.get(name: name, at: depth - 1)
         }
-        
-        guard let value = environment?.values[name.lexeme] else {
-            throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
-        }
-        
-        return value
-    }
-    
-    func getThis() throws -> LiteralValue {
-        return values["this"]!
-    }
-    
-    func getThis(at depth: Int) -> LiteralValue {
-        var environment: Environment? = self
-        for _ in 0..<depth {
-            environment = environment?.enclosing
-        }
-        
-        return environment!.values["this"]!
-    }
-    
-    func getSuper(at depth: Int) throws -> LiteralValue {
-        var environment: Environment? = self
-        for _ in 0..<depth {
-            environment = environment?.enclosing
-        }
-        
-        return environment!.values["super"]!
     }
     
     func assign(name: Token, value: LiteralValue, at depth: Int) throws {

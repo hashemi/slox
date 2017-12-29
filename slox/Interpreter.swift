@@ -140,10 +140,10 @@ extension ResolvedExpr {
             return value
         
         case .super(_, let methodExpr, let depth):
-            guard case let .class(superclass) = try environment.getSuper(at: depth)
+            guard case let .class(superclass) = environment.get(name: "super", at: depth)!
                 else { fatalError("Got a non-class for 'super'.") }
             
-            guard case let .instance(object) = environment.getThis(at: depth - 1)
+            guard case let .instance(object) = environment.get(name: "this", at: depth - 1)!
                 else { fatalError("Got a non-object for 'this'.") }
             
             guard let method = superclass.find(instance: object, method: methodExpr.lexeme) else {
@@ -153,13 +153,19 @@ extension ResolvedExpr {
             return .function(method)
         
         case .this(let keyword, let depth):
-            return try environment.get(name: keyword, at: depth)
+            guard let value = environment.get(name: keyword.lexeme, at: depth) else {
+                throw RuntimeError(keyword, "Undefined variable '" + keyword.lexeme + "'.")
+            }
+            return value
             
         case .grouping(let expr):
             return try expr.evaluate(environment: environment)
         
         case .variable(let name, let depth):
-            return try environment.get(name: name, at: depth)
+            guard let value = environment.get(name: name.lexeme, at: depth) else {
+                throw RuntimeError(name, "Undefined variable '" + name.lexeme + "'.")
+            }
+            return value
         
         case .assign(let name, let value, let depth):
             let value = try value.evaluate(environment: environment)
