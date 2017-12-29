@@ -89,8 +89,10 @@ class Parser {
             }
         }
     }
+}
 
-    // Expressions
+// Expressions
+extension Parser {
     private func expression() throws -> Expr {
         return try assignment()
     }
@@ -258,8 +260,10 @@ class Parser {
         
         throw error(peek, "Expect expression.")
     }
+}
 
-    // Statements
+// Statements
+extension Parser {
     private func declaration() throws -> Stmt? {
         do {
             if match(.class) {
