@@ -5,36 +5,32 @@ This is an interpreter of the Lox Language written in Swift.
 This project follows Bob Nystrom's excellent book,
 [Crafting Interpreters](http://www.craftinginterpreters.com)
 which takes you through the process of writing an interpreter for a language
-called Lox. The book is being released as chapters are completed, one chapter
-at a time. At this time, the Java interpreter part of the book is complete.
-The next part of the book will implement a Lox compiler in C.
+called Lox.
 
-## Progress
-As of 24 Dec 2017, this Swift implementation is complete. The following
-chapters are implemented:
+In the book, the language is implemented as an tree-walking interpreter
+in Java and a bytecode compiler and VM in C. This project ports the
+Java version to Swift. It now complete in Dec 2017. 🎉
 
-4. Scanning
-5. Representing Code
-6. Parsing Expressions
-7. Evaluating Expressions
-8. Statements and State
-9. Control Flow
-10. Functions
-11. Resolving and Binding
-12. Classes
-13. Inheritance
+## Related Projects
+
+* [bslox](https://github.com/hashemi/bslox) is my Swift port of the
+bytecode/VM, C version.
+
+* [CompilerKit](https://github.com/hashemi/CompilerKit) is a Swift
+collection data structures and algorithms that can be used in
+constructing a compiler.
 
 ## Tests
-As of 24 Dec 2017, the test suite is up to date with the reference Java
-implementation. The majority of chapter 13 tests pass successfully. The two
-exceptions are class equality and method equality.
-
-To run the tests:
+The test suite is from the reference Java implementation. To run the
+tests:
 
 ```shell
 $ swift build
 $ ./test_swift.py chap13_inheritance
 ```
+
+Almost all tests pass. The only two exceptions are class and method
+equality.
 
 ## Goals & Design
 The main goal is to write a Lox interpreter in Swift while demonstrating
@@ -91,11 +87,8 @@ new AstPrinter().print(expression)
 ```
 
 ## Alternatives
-* Alejandro Martinez
-[beat me to the port and name](https://github.com/alexito4/slox).
-
-* Bob Nystrom lists ports in different languages on the
-[books wiki on GitHub](https://github.com/munificent/craftinginterpreters/wiki/Lox-implementations).
+* A list of ports is available in the
+[books GitHub wiki](https://github.com/munificent/craftinginterpreters/wiki/Lox-implementations).
 
 ## License
 MIT
