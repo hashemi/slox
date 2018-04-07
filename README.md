@@ -7,9 +7,11 @@ This project follows Bob Nystrom's excellent book,
 which takes you through the process of writing an interpreter for a language
 called Lox.
 
-In the book, the language is implemented as an tree-walking interpreter
-in Java and a bytecode compiler and VM in C. This project ports the
-Java version to Swift. It now complete in Dec 2017. 🎉
+In the book, the lox is implemented as an tree-walking interpreter
+in Java then as a bytecode compiler and VM in C. This project ports
+the Java version to Swift.
+
+This project is now complete 🎉.
 
 ## Related Projects
 
